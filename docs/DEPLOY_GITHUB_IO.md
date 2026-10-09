@@ -1,25 +1,23 @@
 # Full GitHub Pages deployment (game + ZK contracts)
 
-To get the game running at `https://<user>.github.io/ByteSurvivor/` with contracts and ZK:
+To get the game running at `https://bytesurvivor-games.vercel.app/` with contracts and ZK:
 
 ---
 
 ## Summary
 
-| Component | Where | Status |
-|------------|-------|--------|
-| Frontend | GitHub Pages (deploy on push to main) | ✅ Already configured |
-| Contracts | Stellar Testnet (Policy + Verifier) | ✅ Already deployed |
-| ZK Prover | Render / Railway (generates proofs) | Deployment pending |
-| Secrets | GitHub → Settings → Secrets | Configuration pending |
+| Component | Where                                 | Status                |
+| --------- | ------------------------------------- | --------------------- |
+| Frontend  | GitHub Pages (deploy on push to main) | ✅ Already configured |
+| Contracts | Stellar Testnet (Policy + Verifier)   | ✅ Already deployed   |
+| ZK Prover | Render / Railway (generates proofs)   | Deployment pending    |
+| Secrets   | GitHub → Settings → Secrets           | Configuration pending |
 
 ---
 
 ## 1. GitHub Pages (frontend)
 
 The `.github/workflows/deploy.yml` workflow already deploys on every push to `main`.
-
-**Final URL:** `https://<user>.github.io/ByteSurvivor/` (or `https://<org>.github.io/ByteSurvivor/`)
 
 **Check:** GitHub → Settings → Pages → Source: GitHub Actions must be enabled.
 
@@ -29,11 +27,11 @@ The `.github/workflows/deploy.yml` workflow already deploys on every push to `ma
 
 Current contracts on Testnet:
 
-| Contract | ID |
-|----------|-----|
-| Policy (bytesurvivor) | `CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO` |
+| Contract               | ID                                                         |
+| ---------------------- | ---------------------------------------------------------- |
+| Policy (bytesurvivor)  | `CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO` |
 | Verifier (zk_verifier) | `CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA` |
-| Game Hub | `CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG` |
+| Game Hub               | `CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG` |
 
 If you want to deploy your own: [DEPLOY_ZK_STEPS.md](DEPLOY_ZK_STEPS.md) or [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md).
 
@@ -89,7 +87,7 @@ git push origin main
 
 The workflow will run and deploy. In 1–2 minutes the app will be at:
 
-`https://<user>.github.io/ByteSurvivor/`
+`https://bytesurvivor-games.vercel.app/`
 
 **Check:**
 
