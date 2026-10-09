@@ -170,7 +170,7 @@ bytesurvivor/
 
 ## Deploy
 
-The game deploys to **GitHub Pages** on push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (build with `npm run build`). Enable GitHub Pages in the repo settings (Source: GitHub Actions). The live URL is **https://stellar-playvores.github.io/ByteSurvivor/**.
+The game deploys to **GitHub Pages** on push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (build with `npm run build`). Enable GitHub Pages in the repo settings (Source: GitHub Actions). The live URL is **https://bytesurvivor-games.vercel.app/**.
 
 For contract and prover deployment (Testnet + Render or similar), see [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md) and [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md).
 
