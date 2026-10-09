@@ -1,11 +1,11 @@
-# Vibe Coder Desktop App Design
+# ByteSurvivor Desktop App Design
 
 **Date:** 2026-01-21
 **Status:** Approved
 
 ## Overview
 
-Wrap Vibe Coder in Electron to create a native desktop app that lives in the system tray. Feels like a AAA polished desktop game that runs alongside your IDE while you code.
+Wrap ByteSurvivor in Electron to create a native desktop app that lives in the system tray. Feels like a AAA polished desktop game that runs alongside your IDE while you code.
 
 ## Key Decisions
 
@@ -21,7 +21,7 @@ Wrap Vibe Coder in Electron to create a native desktop app that lives in the sys
 ## Architecture
 
 ```
-vibe-coder/
+ByteSurvivor/
 ├── electron/
 │   ├── main.js              # Electron main process
 │   ├── preload.js           # Bridge between main/renderer
@@ -137,7 +137,7 @@ Global hotkey (e.g., `Cmd+Shift+V`) cycles between modes or toggles visibility.
 
 ```
 ┌─────────────────┐     WebSocket     ┌──────────────────┐
-│  Claude Code    │ ───────────────▶  │  Vibe Coder App  │
+│  Claude Code    │ ───────────────▶  │  ByteSurvivor App │
 │  (hooks)        │    port 3001      │  (Electron)      │
 └─────────────────┘                   └──────────────────┘
 ```

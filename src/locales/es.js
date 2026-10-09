@@ -1,5 +1,5 @@
 /**
- * Spanish locale for Cosmic Coder / Español para Codificador Cósmico
+ * Spanish locale for ByteSurvivor / Español para Codificador Cósmico
  */
 export default {
   title: 'CODIFICADOR CÓSMICO',
@@ -82,7 +82,7 @@ export default {
     mode_casual: 'MODO: CASUAL',
     zk_enabled: 'ZK PROOF: ACTIVADO',
     zk_disabled: 'ZK PROOF: DESACTIVADO',
-    description: 'Cosmic Coder valida tu partida con Zero-Knowledge Proofs.\nSe muestran los puntos; la wave no se revela on-chain; solo se confirma elegibilidad.',
+    description: 'ByteSurvivor valida tu partida con Zero-Knowledge Proofs.\nSe muestran los puntos; la wave no se revela on-chain; solo se confirma elegibilidad.',
     zk_weapon_hint: 'ARMAS ZK: La Shotgun se desbloquea con 10+ puntos (para pruebas). Cuando está desbloqueada, puede aparecer como arma inicial en partidas Ranked (ZK) y se muestra al lado de tu personaje solo si la desbloqueaste. Otras armas ZK se desbloquean en rangos superiores (Silver/Gold/Diamond).',
     zk_weapon_drop_rule_title: 'ARMAS ZK — REGLA DE DROP',
     zk_weapon_drop_rule: 'Las armas ZK solo pueden dropear si completas la prueba completa del Zero Knowledge Ledger. Cuando tu cuenta tiene el hash y un envío on-chain exitoso, puedes recibir drops de armas ZK. Las cuentas que no han completado la prueba no pueden dropear ni recoger armas ZK.',
@@ -300,7 +300,7 @@ export default {
     submit_error_contract: 'Error de contrato — verifier no configurado',
     submit_error_network: 'Error de red — prover despertando, reintenta',
     submit_error_prover_sleeping: 'ZK prover despertando — reintenta en 30s',
-    leaderboard_hint: 'Para salir en el ranking on-chain: conecta wallet y configura el contrato de Cosmic Coder (config.json o .env).',
+    leaderboard_hint: 'Para salir en el ranking on-chain: conecta wallet y configura el contrato de ByteSurvivor (config.json o .env).',
     start_match_failed: 'No se pudo iniciar partida on-chain. Puedes jugar igual; firma en Freighter al empezar para enviar puntuaciones.',
     xp_lost: 'XP PERDIDOS',
     immortal_respawn: '♾️ REVIVIR INMORTAL',
@@ -396,7 +396,7 @@ export default {
     deadlock: 'DEADLOCK'
   },
   barks: {
-    vibecoder: [
+    bytesurvivor: [
       'Awaiting async annihilation...',
       'Mi código compila a la primera. ¿El tuyo?',
       'Flow state alcanzado. Latencia en Stellar: 0ms.',

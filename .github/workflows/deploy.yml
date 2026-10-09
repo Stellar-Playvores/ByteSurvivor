@@ -1,4 +1,4 @@
-# Deploy Vibe Coder to GitHub Pages
+# Deploy ByteSurvivor to GitHub Pages
 name: Deploy to GitHub Pages
 
 on:
@@ -41,7 +41,7 @@ jobs:
       - name: Write config from env
         run: node scripts/write_config_from_env.js
         env:
-          VITE_COSMIC_CODER_CONTRACT_ID: ${{ secrets.VITE_COSMIC_CODER_CONTRACT_ID }}
+          VITE_BYTE_SURVIVOR_CONTRACT_ID: ${{ secrets.VITE_BYTE_SURVIVOR_CONTRACT_ID }}
           VITE_GAME_HUB_CONTRACT_ID: ${{ secrets.VITE_GAME_HUB_CONTRACT_ID }}
           VITE_ZK_PROVER_URL: ${{ secrets.VITE_ZK_PROVER_URL }}
           VITE_PROGRESS_API_URL: ${{ secrets.VITE_PROGRESS_API_URL }}

@@ -1,6 +1,6 @@
 /**
- * Simple i18n for Cosmic Coder - English & Spanish
- * Uses VIBE_SETTINGS.language ('en' | 'es'). Fallback: 'en'.
+ * Simple i18n for ByteSurvivor - English & Spanish
+ * Uses BYTE_SURVIVOR_SETTINGS.language ('en' | 'es'). Fallback: 'en'.
  */
 import en from '../locales/en.js';
 import es from '../locales/es.js';
@@ -8,7 +8,7 @@ import es from '../locales/es.js';
 const locales = { en, es };
 
 function getLanguage() {
-  const lang = (typeof window !== 'undefined' && window.VIBE_SETTINGS?.language) || 'en';
+  const lang = (typeof window !== 'undefined' && window.BYTE_SURVIVOR_SETTINGS?.language) || 'en';
   return locales[lang] ? lang : 'en';
 }
 
@@ -17,9 +17,9 @@ export function currentLang() {
 }
 
 export function setLanguage(lang) {
-  if (locales[lang] && typeof window !== 'undefined' && window.VIBE_SETTINGS) {
-    window.VIBE_SETTINGS.language = lang;
-    window.VIBE_SETTINGS.save();
+  if (locales[lang] && typeof window !== 'undefined' && window.BYTE_SURVIVOR_SETTINGS) {
+    window.BYTE_SURVIVOR_SETTINGS.language = lang;
+    window.BYTE_SURVIVOR_SETTINGS.save();
     return true;
   }
   return false;
@@ -42,7 +42,7 @@ export function t(key) {
 }
 
 /**
- * Get array of dev/hacker bark phrases for a character (vibecoder, destroyer, swordsman).
+ * Get array of dev/hacker bark phrases for a character (bytesurvivor, destroyer, swordsman).
  * @param {string} charId - character id
  * @returns {string[]}
  */

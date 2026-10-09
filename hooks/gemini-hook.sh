@@ -1,5 +1,5 @@
 #!/bin/bash
-# Vibe Coder XP Hook for Google Gemini CLI
+# ByteSurvivor XP Hook for Google Gemini CLI
 #
 # Usage: Add this to your Gemini CLI workflow or pipe output through it
 # Example: gemini "your prompt" | ./gemini-hook.sh
@@ -14,7 +14,7 @@ else
   ACTION=$(cat)
 fi
 
-# Send to Vibe Coder server
+# Send to ByteSurvivor server
 curl -s -X POST http://localhost:3333/cli/gemini \
   -H "Content-Type: application/json" \
   -d "{\"action\": \"gemini_activity\", \"data\": {\"action\": \"$ACTION\"}}" \
@@ -22,5 +22,5 @@ curl -s -X POST http://localhost:3333/cli/gemini \
   --max-time 2 \
   > /dev/null 2>&1 &
 
-echo "Gemini XP sent to Vibe Coder!"
+echo "Gemini XP sent to ByteSurvivor!"
 exit 0

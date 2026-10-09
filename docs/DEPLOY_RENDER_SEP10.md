@@ -1,8 +1,8 @@
-# Despliegue SEP-10 en Render (Cosmic Coder)
+# SEP-10 deployment on Render (ByteSurvivor)
 
-## ✅ PASO 1 — Estructura del backend
+## ✅ STEP 1 — Backend structure
 
-La carpeta `server/` debe tener:
+The `server/` folder must contain:
 
 ```
 server/
@@ -14,72 +14,72 @@ server/
   index.js
 ```
 
-Si falta algo, usa el código que generó Cursor para SEP-10.
+If anything is missing, use the code that Cursor generated for SEP-10.
 
 ---
 
-## 🗄 PASO 2 — Base de datos (CRÍTICO)
+## 🗄 STEP 2 — Database (CRITICAL)
 
-### En Render
+### On Render
 
-1. **New → PostgreSQL** (si aún no tienes).
-2. Copia el **External Database URL** (o Internal si el backend está en Render).
-3. En tu **servicio backend** (Web Service) añade la variable de entorno:
-   - `DATABASE_URL` = esa URL (Internal para mismo Render, External para local/otros).
+1. **New → PostgreSQL** (if you don't have one yet).
+2. Copy the **External Database URL** (or Internal if the backend is on Render).
+3. In your **backend service** (Web Service) add the environment variable:
+   - `DATABASE_URL` = that URL (Internal for the same Render account, External for local/other hosts).
 
-### Ejecutar el schema (obligatorio)
+### Run the schema (mandatory)
 
-Si no ejecutas el schema, la tabla `users` no existe y nada se guarda.
+If you don't run the schema, the `users` table doesn't exist and nothing gets saved.
 
-Desde tu máquina (con `psql` instalado):
+From your machine (with `psql` installed):
 
 ```bash
-# Sustituye por tu External Database URL de Render (o usa la variable si la tienes)
-psql "postgresql://cosmic_coder_user:TU_PASSWORD@dpg-XXXXX.oregon-postgres.render.com/cosmic_coder" -f server/db/schema.sql
+# Replace with your Render External Database URL (or use the variable if you have it)
+psql "postgresql://bytesurvivor_user:YOUR_PASSWORD@dpg-XXXXX.oregon-postgres.render.com/bytesurvivor" -f server/db/schema.sql
 ```
 
-O si ya tienes `DATABASE_URL` en tu entorno:
+Or if you already have `DATABASE_URL` in your environment:
 
 ```bash
 psql "$DATABASE_URL" -f server/db/schema.sql
 ```
 
-**Alternativa sin `psql`** (desde el repo, con Node):
+**Alternative without `psql`** (from the repo, with Node):
 
 ```bash
-DATABASE_URL="postgresql://usuario:password@host:5432/cosmic_coder" node scripts/run_db_schema.js
+DATABASE_URL="postgresql://user:password@host:5432/bytesurvivor" node scripts/run_db_schema.js
 ```
 
-Usa tu **External Database URL** de Render (solo para ejecutar este script una vez; no subas la URL con contraseña al repo). En Render (Dashboard → PostgreSQL → Info) tienes el **PSQL Command**; también puedes pegar el contenido de `server/db/schema.sql` en la consola SQL de Render.
+Use your Render **External Database URL** (only to run this script once; don't commit the URL with the password to the repo). On Render (Dashboard → PostgreSQL → Info) you have the **PSQL Command**; you can also paste the contents of `server/db/schema.sql` into Render's SQL console.
 
 ---
 
-## 🔐 PASO 3 — Variables de entorno (backend en Render)
+## 🔐 STEP 3 — Environment variables (backend on Render)
 
-En el **Web Service** del backend, en **Environment** añade:
+In the backend **Web Service**, under **Environment** add:
 
-| Variable | Valor | Notas |
-|----------|--------|--------|
-| `DATABASE_URL` | *(Internal Database URL de tu PostgreSQL en Render)* | Ej: `postgresql://...@dpg-XXX-a/cosmic_coder` |
-| `SEP10_SERVER_SECRET_KEY` | `S...` | Cuenta Stellar **nueva** solo para el servidor. No la del contrato ni tu wallet personal. |
-| `JWT_SECRET` | Cadena larga y aleatoria | Ej: `openssl rand -hex 32` |
-| `SEP10_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015` | Testnet. Para mainnet usa el de Public Network. |
-| `SEP10_HOME_DOMAIN` | `cosmiccoder.app` | Tu dominio. |
-| `SEP10_WEB_AUTH_DOMAIN` | URL pública del backend | Ej: `https://cosmic-coder-api.onrender.com` (debe ser la URL desde la que sirves `/auth/challenge`). |
+| Variable | Value | Notes |
+|----------|--------|-------|
+| `DATABASE_URL` | *(Internal Database URL of your PostgreSQL on Render)* | E.g. `postgresql://...@dpg-XXX-a/bytesurvivor` |
+| `SEP10_SERVER_SECRET_KEY` | `S...` | A **new** Stellar account used only by the server. Not the contract's nor your personal wallet. |
+| `JWT_SECRET` | Long random string | E.g. `openssl rand -hex 32` |
+| `SEP10_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015` | Testnet. For mainnet use the Public Network passphrase. |
+| `SEP10_HOME_DOMAIN` | `bytesurvivor.app` | Your domain. |
+| `SEP10_WEB_AUTH_DOMAIN` | Public URL of the backend | E.g. `https://bytesurvivor-api.onrender.com` (must be the URL you serve `/auth/challenge` from). |
 
-Importante: `SEP10_SERVER_SECRET_KEY` debe ser una cuenta Stellar real generada para el servidor (crear par de llaves nuevo y usar la secret `S...`).
+Important: `SEP10_SERVER_SECRET_KEY` must be a real Stellar account generated for the server (create a new keypair and use its `S...` secret).
 
 ---
 
-## 🧪 PASO 4 — Probar antes del frontend
+## 🧪 STEP 4 — Test before the frontend
 
 ### 1. Challenge
 
 ```http
-GET https://tu-backend.onrender.com/auth/challenge?account=GXXXXXXXX...
+GET https://your-backend.onrender.com/auth/challenge?account=GXXXXXXXX...
 ```
 
-Respuesta esperada:
+Expected response:
 
 ```json
 {
@@ -88,21 +88,21 @@ Respuesta esperada:
 }
 ```
 
-Si no ves eso, revisa `server/config/sep10.js` y que `SEP10_SERVER_SECRET_KEY` esté definida.
+If you don't see that, check `server/config/sep10.js` and make sure `SEP10_SERVER_SECRET_KEY` is defined.
 
 ### 2. Token
 
-1. Firma en Freighter la `transaction` que te devolvió el challenge (usando el `network_passphrase` indicado).
-2. Envía la XDR firmada:
+1. Sign the `transaction` returned by the challenge in Freighter (using the indicated `network_passphrase`).
+2. Send the signed XDR:
 
 ```http
-POST https://tu-backend.onrender.com/auth/token
+POST https://your-backend.onrender.com/auth/token
 Content-Type: application/json
 
-{"transaction": "LA_XDR_FIRMADA_EN_BASE64"}
+{"transaction": "SIGNED_XDR_IN_BASE64"}
 ```
 
-Respuesta esperada:
+Expected response:
 
 ```json
 {
@@ -111,18 +111,18 @@ Respuesta esperada:
 }
 ```
 
-Si recibes eso, SEP-10 está funcionando en el backend.
+If you get that, SEP-10 is working on the backend.
 
 ---
 
-## 🎮 PASO 5 — Frontend
+## 🎮 STEP 5 — Frontend
 
-1. En el proyecto (o en el build de Render/GitHub Pages) configura:
-   - `VITE_API_URL=https://tu-backend.onrender.com`  
-   (sin barra final; sin `/auth`).
+1. In the project (or in the Render/GitHub Pages build) configure:
+   - `VITE_API_URL=https://your-backend.onrender.com`  
+   (no trailing slash; no `/auth`).
 
-2. El login debe usar la wallet para firmar, no el SDK manual:
-   - En el código ya está: `stellarWallet.signTransaction(xdr, networkPassphrase)`.
-   - El `network_passphrase` viene en la respuesta del challenge y se pasa a Freighter.
+2. Login must use the wallet to sign, not the manual SDK:
+   - Already in the code: `stellarWallet.signTransaction(xdr, networkPassphrase)`.
+   - The `network_passphrase` comes in the challenge response and is passed to Freighter.
 
-Con eso, el flujo Connect wallet → Challenge → Sign in Freighter → Token → JWT y usuario en DB debería funcionar de punta a punta.
+With that, the Connect wallet → Challenge → Sign in Freighter → Token → JWT and user in DB flow should work end to end.

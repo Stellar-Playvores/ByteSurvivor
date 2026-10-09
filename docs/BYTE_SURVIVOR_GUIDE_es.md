@@ -1,4 +1,4 @@
-# Cosmic Coder — Guía completa del juego y ZK
+# ByteSurvivor — Guía completa del juego y ZK
 
 **Versión:** 0.8.x · Documentación de referencia y uso.
 
@@ -6,9 +6,9 @@
 
 ## Parte 1 — Cómo funciona el juego
 
-### 1.1 Qué es Cosmic Coder
+### 1.1 Qué es ByteSurvivor
 
-**Cosmic Coder** (Codificador Cósmico) es un juego de supervivencia al estilo *Vampire Survivors*: controlas a un personaje en una arena, matas oleadas de enemigos, subes de nivel, desbloqueas armas y mejoras, y tratas de aguantar el máximo de oleadas posible. Cuando mueres, tu partida se registra (local y, si tienes wallet conectada, en blockchain). El juego tiene dos modos de envío a chain: **casual** (legacy) y **ranked** (con prueba ZK).
+**ByteSurvivor** (Codificador Cósmico) es un juego de supervivencia al estilo *Vampire Survivors*: controlas a un personaje en una arena, matas oleadas de enemigos, subes de nivel, desbloqueas armas y mejoras, y tratas de aguantar el máximo de oleadas posible. Cuando mueres, tu partida se registra (local y, si tienes wallet conectada, en blockchain). El juego tiene dos modos de envío a chain: **casual** (legacy) y **ranked** (con prueba ZK).
 
 - **Requisito para jugar:** Tienes que **vincular sí o sí** tu cuenta de **[Freighter](https://www.freighterapp.com/)** en la pantalla de título para poder jugar. El juego exige una wallet de Stellar conectada (extensión Freighter en el navegador).
 - **Objetivo:** Sobrevivir el máximo de oleadas, acumular XP (puntuación) y aparecer en el ranking.
@@ -66,7 +66,7 @@
 | **Cuándo se usa** | Sin prover ZK o partida “Continuar” | Partida **nueva** + prover configurado + contrato con verifier |
 | **Leaderboard** | Legacy (oleada + puntuación) | Por temporada (season_id), solo score |
 
-Para **ranked** necesitas: (1) wallet conectada, (2) contrato (Cosmic Coder) configurado con verifier, (3) backend prover (`VITE_ZK_PROVER_URL`) y (4) empezar una partida **nueva** (no “Continuar”) para que exista `runSeed` y se pueda generar y verificar la proof.
+Para **ranked** necesitas: (1) wallet conectada, (2) contrato (ByteSurvivor) configurado con verifier, (3) backend prover (`VITE_ZK_PROVER_URL`) y (4) empezar una partida **nueva** (no “Continuar”) para que exista `runSeed` y se pueda generar y verificar la proof.
 
 ---
 
@@ -84,11 +84,11 @@ En un juego que corre en el navegador, el servidor/contrato no puede “ver” t
 
 ### 2.2 Qué es exactamente la “proof” y el circuito
 
-- **Circuito (Circom):** Es un programa que define un “enunciado”: dados unos **inputs privados** y unos **outputs públicos**, el circuito comprueba relaciones entre ellos. En Cosmic Coder, el circuito `GameRun.circom` expone como **salidas públicas**:
+- **Circuito (Circom):** Es un programa que define un “enunciado”: dados unos **inputs privados** y unos **outputs públicos**, el circuito comprueba relaciones entre ellos. En ByteSurvivor, el circuito `GameRun.circom` expone como **salidas públicas**:
   - `run_hash_hi`, `run_hash_lo` (commitment de la partida),
   - `score`, `wave`, `nonce`, `season_id`.
 - **Proof (Groth16):** Es un certificado corto (tres elementos de grupo: a, b, c) que demuestra “yo ejecuté el circuito con estos inputs y obtuve estas salidas públicas”. Quien tiene la **verification key (VK)** puede comprobar en cadena que la proof corresponde a esas señales públicas **sin** re-ejecutar el circuito.
-- **Verificación on-chain:** El contrato **zk_verifier** recibe (VK, proof, pub_signals), calcula la combinación lineal `vk_x` con las señales públicas y comprueba la ecuación de pairing. Si todo cuadra, devuelve “válido”; el contrato de política (Cosmic Coder) entonces marca el nonce como usado, actualiza el leaderboard de la temporada y emite el evento.
+- **Verificación on-chain:** El contrato **zk_verifier** recibe (VK, proof, pub_signals), calcula la combinación lineal `vk_x` con las señales públicas y comprueba la ecuación de pairing. Si todo cuadra, devuelve “válido”; el contrato de política (ByteSurvivor) entonces marca el nonce como usado, actualiza el leaderboard de la temporada y emite el evento.
 
 ---
 
@@ -100,7 +100,7 @@ En un juego que corre en el navegador, el servidor/contrato no puede “ver” t
    - `run_hash = H(player || wave || score || runSeed || timestamp)` (SHA-256 en el cliente).
    - Se valida que (wave, score) cumplan las reglas del juego.
 4. **Petición de proof (opción B — backend):** El cliente llama al backend con `run_hash_hex`, `score`, `wave`, `nonce`, `season_id`. El backend escribe `input.json`, ejecuta el prover (snarkjs) y devuelve `contract_proof.json` (proof + VK + pub_signals en formato para el contrato).
-5. **Envío on-chain:** El cliente firma y llama `submit_zk` al contrato Cosmic Coder con:
+5. **Envío on-chain:** El cliente firma y llama `submit_zk` al contrato ByteSurvivor con:
    - proof, VK, pub_signals,
    - nonce, run_hash (32 bytes), season_id, score, wave,
    - y se autoriza como `player`.
@@ -131,7 +131,7 @@ Así, **todo** el flujo ranked queda atado: mismo run_hash/score/wave/nonce/seas
 
 - **Circuito:** 6 salidas públicas (run_hash hi/lo, score, wave, nonce, season_id). VK con `ic` de longitud 7.
 - **Proof:** Groth16 (a, b, c); verificación con BN254 en Soroban.
-- **Contratos:** `zk_types` (tipos compartidos), `zk_verifier` (solo verifica proof), `cosmic_coder` (política: replay, leaderboard, eventos, Hub).
+- **Contratos:** `zk_types` (tipos compartidos), `zk_verifier` (solo verifica proof), `bytesurvivor` (política: replay, leaderboard, eventos, Hub).
 - **Documentación técnica detallada:** Ver `TECHNICAL_DOCUMENTATION.md` y `ZK_REAL_SETUP.md` (requisitos, compilación del circuito, scripts, opción B, checklist).
 
 ---

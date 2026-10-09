@@ -52,7 +52,7 @@ export default class TitleScene extends Phaser.Scene {
     // Menu music mode (Arcade by Lucjo - loop infinito)
     Audio.setMusicMode('menu');
     // Always reset to a fresh menu track when entering the title screen
-    if (window.VIBE_SETTINGS?.musicEnabled) {
+    if (window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) {
       Audio.startMenuMusic();
     }
 
@@ -60,7 +60,7 @@ export default class TitleScene extends Phaser.Scene {
     const onFirstInteraction = () => {
       Audio.initAudio();
       Audio.resumeAudio();
-      if (window.VIBE_SETTINGS?.musicEnabled && !Audio.isMenuMusicPlaying()) {
+      if (window.BYTE_SURVIVOR_SETTINGS?.musicEnabled && !Audio.isMenuMusicPlaying()) {
         Audio.startMenuMusic();
       }
     };
@@ -85,10 +85,10 @@ export default class TitleScene extends Phaser.Scene {
         // If wallet connected but user has no username in DB, show name modal (transparent overlay)
         try {
           const me = await authApi.getMe();
-          if (me && me.username && window.VIBE_SETTINGS) {
+          if (me && me.username && window.BYTE_SURVIVOR_SETTINGS) {
             const name = String(me.username).slice(0, 20);
-            if (name && window.VIBE_SETTINGS.playerName !== name) {
-              window.VIBE_SETTINGS.setPlayerName(name);
+            if (name && window.BYTE_SURVIVOR_SETTINGS.playerName !== name) {
+              window.BYTE_SURVIVOR_SETTINGS.setPlayerName(name);
             }
           }
           if (me && (me.username == null || me.username === '')) {
@@ -101,10 +101,10 @@ export default class TitleScene extends Phaser.Scene {
     // If token exists (backend session), sync username even without wallet being connected yet
     if (typeof authApi.getStoredToken === 'function' && authApi.getStoredToken()) {
       authApi.getMe().then((me) => {
-        if (me && me.username && window.VIBE_SETTINGS) {
+        if (me && me.username && window.BYTE_SURVIVOR_SETTINGS) {
           const name = String(me.username).slice(0, 20);
-          if (name && window.VIBE_SETTINGS.playerName !== name) {
-            window.VIBE_SETTINGS.setPlayerName(name);
+          if (name && window.BYTE_SURVIVOR_SETTINGS.playerName !== name) {
+            window.BYTE_SURVIVOR_SETTINGS.setPlayerName(name);
             if (this.updateWalletButton) this.updateWalletButton();
           }
         }
@@ -149,7 +149,7 @@ export default class TitleScene extends Phaser.Scene {
     this.createDebugOverlay();
 
     // Check if we need to ask for name on first launch
-    if (!window.VIBE_SETTINGS.playerName) {
+    if (!window.BYTE_SURVIVOR_SETTINGS.playerName) {
       this.time.delayedCall(500, () => this.showNameInput(true));
     }
 
@@ -522,7 +522,7 @@ export default class TitleScene extends Phaser.Scene {
       color: '#ffd700'
     }).setOrigin(0, 0.5).setDepth(10);
 
-    const currency = window.VIBE_UPGRADES?.currency ?? 0;
+    const currency = window.BYTE_SURVIVOR_UPGRADES?.currency ?? 0;
     const bitsPos = anchorBottomRight(this, 140, 42);
     this.bitsText = this.add.text(bitsPos.x, bitsPos.y, `${t('footer.bits')}: ${currency}`, {
       fontFamily: '"Segoe UI", system-ui, sans-serif',
@@ -607,13 +607,13 @@ export default class TitleScene extends Phaser.Scene {
 
     // Idioma (EN/ES) debajo del badge de conexión
     const langPos = anchorTopRight(this, 20, 44);
-    this.langBtn = this.add.text(langPos.x, langPos.y, window.VIBE_SETTINGS?.language === 'es' ? 'ES' : 'EN', {
+    this.langBtn = this.add.text(langPos.x, langPos.y, window.BYTE_SURVIVOR_SETTINGS?.language === 'es' ? 'ES' : 'EN', {
       fontFamily: '"Segoe UI", system-ui, sans-serif',
       fontSize: 12 * uiScale,
       color: '#00aaff'
     }).setOrigin(1, 0).setDepth(10).setInteractive({ useHandCursor: true });
     this.langBtn.on('pointerdown', () => {
-      const lang = window.VIBE_SETTINGS?.language === 'es' ? 'en' : 'es';
+      const lang = window.BYTE_SURVIVOR_SETTINGS?.language === 'es' ? 'en' : 'es';
       setLanguage(lang);
       this.scene.start('TitleScene');
     });
@@ -664,7 +664,7 @@ export default class TitleScene extends Phaser.Scene {
 
   updateBitsDisplay() {
     if (this.bitsText && this.bitsText.scene) {
-      const currency = window.VIBE_UPGRADES?.currency ?? 0;
+      const currency = window.BYTE_SURVIVOR_UPGRADES?.currency ?? 0;
       this.bitsText.setText(`${t('footer.bits')}: ${currency}`);
     }
   }
@@ -708,12 +708,12 @@ export default class TitleScene extends Phaser.Scene {
     inputEl.placeholder = t('auth.username_placeholder') || 'Username';
     inputEl.maxLength = 64;
     inputEl.setAttribute('autocomplete', 'username');
-    inputEl.id = 'vibe-username-modal-input';
+    inputEl.id = 'byte-survivor-username-modal-input';
     // Ensure placeholder is visible (light gray on dark background)
-    if (!document.getElementById('vibe-username-modal-styles')) {
+    if (!document.getElementById('byte-survivor-username-modal-styles')) {
       const styleEl = document.createElement('style');
-      styleEl.id = 'vibe-username-modal-styles';
-      styleEl.textContent = '#vibe-username-modal-input::placeholder { color: #a0b8c8; opacity: 1; }';
+      styleEl.id = 'byte-survivor-username-modal-styles';
+      styleEl.textContent = '#byte-survivor-username-modal-input::placeholder { color: #a0b8c8; opacity: 1; }';
       document.head.appendChild(styleEl);
     }
     const inputStyles = [
@@ -738,7 +738,7 @@ export default class TitleScene extends Phaser.Scene {
       if (!name) return;
       try {
         await authApi.updateMeUsername(name);
-        if (window.VIBE_SETTINGS) window.VIBE_SETTINGS.setPlayerName(name.slice(0, 20));
+        if (window.BYTE_SURVIVOR_SETTINGS) window.BYTE_SURVIVOR_SETTINGS.setPlayerName(name.slice(0, 20));
         this.updateWalletButton();
         closeModal();
       } catch (e) {
@@ -799,14 +799,14 @@ export default class TitleScene extends Phaser.Scene {
   onCycleCharacter(dir) {
     cycleCharacter(dir).then((charId) => {
       this.refreshIdlePlayerSprite();
-      if (window.VIBE_SETTINGS?.sfxEnabled) Audio.playLevelUp();
+      if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) Audio.playLevelUp();
     });
   }
 
   getActiveCharacterMeta() {
-    const fallbackChar = { textureKey: 'player', animPrefix: 'player', name: 'VibeCoder' };
-    const charId = progressStore.selectedCharacter || window.VIBE_SELECTED_CHARACTER || 'vibecoder';
-    const char = window.VIBE_CHARACTERS?.[charId] || window.VIBE_CHARACTERS?.vibecoder || fallbackChar;
+    const fallbackChar = { textureKey: 'player', animPrefix: 'player', name: 'ByteSurvivor' };
+    const charId = progressStore.selectedCharacter || window.BYTE_SURVIVOR_SELECTED_CHARACTER || 'bytesurvivor';
+    const char = window.BYTE_SURVIVOR_CHARACTERS?.[charId] || window.BYTE_SURVIVOR_CHARACTERS?.bytesurvivor || fallbackChar;
     return { charId, char };
   }
 
@@ -1123,7 +1123,7 @@ export default class TitleScene extends Phaser.Scene {
     const playerX = Math.max(120, Math.floor(w * 0.18));
     const playerY = Math.floor(h * 0.74);
 
-    // Player character - uses selected character (VibeCoder, Destroyer, Swordsman)
+    // Player character - uses selected character (ByteSurvivor, Destroyer, Swordsman)
     const { char } = this.getActiveCharacterMeta();
     let textureKey = null;
     if (this.textures.exists(char.textureKey)) textureKey = char.textureKey;
@@ -1460,8 +1460,8 @@ export default class TitleScene extends Phaser.Scene {
           "Strict Mode: ON.\nCero bugs, cero piedad."
         ]
       },
-      // VibeCoder — zen dev, Vim & async
-      vibecoder: {
+      // ByteSurvivor — zen dev, Vim & async
+      bytesurvivor: {
         en: [
           "Awaiting async\nannihilation...",
           "My code compiles on the first try.\nYours?",
@@ -1585,7 +1585,7 @@ export default class TitleScene extends Phaser.Scene {
     if (this.upgradeMenuOpen || this.weaponMenuOpen || this.characterMenuOpen) return;
 
     // Check for CLI-specific reactions
-    const source = window.VIBE_CODER?.lastXPSource?.name?.toLowerCase();
+    const source = window.BYTE_SURVIVOR?.lastXPSource?.name?.toLowerCase();
     let quotePool = this.codingQuotes;
 
     if (source === 'claude') {
@@ -1647,8 +1647,8 @@ export default class TitleScene extends Phaser.Scene {
       callback: () => {
         if (this.upgradeMenuOpen || this.weaponMenuOpen || this.settingsMenuOpen || this.nameInputOpen || this.usernameModal) return;
         const lang = currentLang();
-        const charId = progressStore.selectedCharacter || window.VIBE_SELECTED_CHARACTER || 'vibecoder';
-        const byChar = this.menuQuotesByChar?.[charId] || this.menuQuotesByChar?.vibecoder;
+        const charId = progressStore.selectedCharacter || window.BYTE_SURVIVOR_SELECTED_CHARACTER || 'bytesurvivor';
+        const byChar = this.menuQuotesByChar?.[charId] || this.menuQuotesByChar?.bytesurvivor;
         const pool = byChar?.[lang] || byChar?.en;
         if (!pool || pool.length === 0) return;
         this.sayQuote(Phaser.Utils.Array.GetRandom(pool));
@@ -1685,7 +1685,7 @@ export default class TitleScene extends Phaser.Scene {
 
     if (!this.shownTimeQuote) {
       this.shownTimeQuote = true;
-      const name = window.VIBE_SETTINGS?.playerName;
+      const name = window.BYTE_SURVIVOR_SETTINGS?.playerName;
       const timeQuote = this.getTimeBasedQuote();
       if (name && String(name).trim()) {
         this.sayQuote(`Hey ${String(name).trim()}!\n${timeQuote}`);
@@ -2083,7 +2083,7 @@ export default class TitleScene extends Phaser.Scene {
       this.titleProjectiles.push(proj);
 
       // Play sound if SFX enabled
-      if (window.VIBE_SETTINGS?.sfxEnabled) {
+      if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) {
         Audio.playShoot();
       }
     }
@@ -2127,7 +2127,7 @@ export default class TitleScene extends Phaser.Scene {
     enemy.destroy();
 
     // Play sound if SFX enabled
-    if (window.VIBE_SETTINGS?.sfxEnabled) {
+    if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) {
       Audio.playHit();
     }
 
@@ -2293,7 +2293,7 @@ export default class TitleScene extends Phaser.Scene {
       case 'DOCUMENTATION':
         // Abre toda la doc en nueva pestaña (evita "Connection lost" al abrir nueva pestaña)
         this.lastDocsOpenTime = Date.now();
-        const docsUrl = new URL('docs/index.html', window.location.href).href + '#COSMIC_CODER_GUIDE';
+        const docsUrl = new URL('docs/index.html', window.location.href).href + '#BYTE_SURVIVOR_GUIDE';
         if (typeof window !== 'undefined') window.open(docsUrl, '_blank', 'noopener');
         break;
 
@@ -2426,10 +2426,10 @@ export default class TitleScene extends Phaser.Scene {
 
     const baseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DOCS_BASE_URL) || (typeof window !== 'undefined' ? window.location.origin + '/docs' : '/docs');
     const docsUrl = baseUrl.replace(/\/$/, '') + (baseUrl.endsWith('/') ? '' : '/');
-    const lang = window.VIBE_SETTINGS?.language === 'es' ? 'es' : 'en';
+    const lang = window.BYTE_SURVIVOR_SETTINGS?.language === 'es' ? 'es' : 'en';
     const links = [
       { label: t('documentation.how_it_works'), path: lang === 'es' ? '/HOW_IT_WORKS.md' : '/HOW_IT_WORKS_en.md' },
-      { label: t('documentation.guide'), path: lang === 'es' ? '/COSMIC_CODER_GUIDE_es.md' : '/COSMIC_CODER_GUIDE_en.md' },
+      { label: t('documentation.guide'), path: lang === 'es' ? '/BYTE_SURVIVOR_GUIDE_es.md' : '/BYTE_SURVIVOR_GUIDE_en.md' },
       { label: t('documentation.technical'), path: lang === 'es' ? '/TECHNICAL_DOCUMENTATION_es.md' : '/TECHNICAL_DOCUMENTATION.md' },
       { label: t('documentation.zk_setup'), path: lang === 'es' ? '/ZK_REAL_SETUP_es.md' : '/ZK_REAL_SETUP.md' }
     ];
@@ -2540,7 +2540,7 @@ export default class TitleScene extends Phaser.Scene {
     let currentDisplayName = '';
     if (walletConnected) {
       currentAddr = await stellarWallet.getAddress();
-      const settings = window.VIBE_SETTINGS || {};
+      const settings = window.BYTE_SURVIVOR_SETTINGS || {};
       const nameFromSettings = (settings.playerName && String(settings.playerName).trim()) || '';
       if (nameFromSettings) {
         currentDisplayName = nameFromSettings.slice(0, 20);
@@ -2552,8 +2552,8 @@ export default class TitleScene extends Phaser.Scene {
           }
         } catch (_) {}
         if (!currentDisplayName) {
-          const cid = progressStore?.selectedCharacter || window.VIBE_SELECTED_CHARACTER || 'vibecoder';
-          const ch = window.VIBE_CHARACTERS?.[cid];
+          const cid = progressStore?.selectedCharacter || window.BYTE_SURVIVOR_SELECTED_CHARACTER || 'bytesurvivor';
+          const ch = window.BYTE_SURVIVOR_CHARACTERS?.[cid];
           currentDisplayName = ch ? (ch.displayName_en || ch.displayName || ch.name || '').slice(0, 20) : 'Anonymous';
         }
         if (!(currentDisplayName && String(currentDisplayName).trim())) currentDisplayName = 'Player';
@@ -2592,7 +2592,7 @@ export default class TitleScene extends Phaser.Scene {
         top = onChain.map((e, i) => {
           const isCurrentUser = currentAddr && e.player && normAddr(e.player) === normAddr(currentAddr);
           const resolved = e.player_name || addrToName[normAddr(e.player)] || (e.player ? stellarWallet.shortAddress(e.player, 6) : 'Unknown');
-          const name = isCurrentUser ? (currentDisplayName || window.VIBE_SETTINGS?.playerName || resolved) : resolved;
+          const name = isCurrentUser ? (currentDisplayName || window.BYTE_SURVIVOR_SETTINGS?.playerName || resolved) : resolved;
           return {
             position: i + 1,
             name,
@@ -2610,7 +2610,7 @@ export default class TitleScene extends Phaser.Scene {
           if (!key || onChainWallets.has(key)) return;
           onChainWallets.add(key);
           const isCurrentUser = currentAddr && normAddr(addr) === normAddr(currentAddr);
-          const name = isCurrentUser ? (currentDisplayName || window.VIBE_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown');
+          const name = isCurrentUser ? (currentDisplayName || window.BYTE_SURVIVOR_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown');
           top.push({
             position: 0,
             name,
@@ -2628,7 +2628,7 @@ export default class TitleScene extends Phaser.Scene {
           const isCurrentUser = currentAddr && e.address && normAddr(e.address) === normAddr(currentAddr);
           return {
             position: i + 1,
-            name: isCurrentUser ? (currentDisplayName || window.VIBE_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown'),
+            name: isCurrentUser ? (currentDisplayName || window.BYTE_SURVIVOR_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown'),
             wallet: e.address || '',
             rank: 0,
             bestScore: e.score ?? 0,
@@ -2643,7 +2643,7 @@ export default class TitleScene extends Phaser.Scene {
         const isCurrentUser = currentAddr && e.address && normAddr(e.address) === normAddr(currentAddr);
         return {
           position: i + 1,
-          name: isCurrentUser ? (currentDisplayName || window.VIBE_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown'),
+          name: isCurrentUser ? (currentDisplayName || window.BYTE_SURVIVOR_SETTINGS?.playerName || e.name || 'Unknown') : (e.name || 'Unknown'),
           wallet: e.address || '',
           rank: 0,
           bestScore: e.score ?? 0,
@@ -3538,9 +3538,9 @@ export default class TitleScene extends Phaser.Scene {
    */
   startRankedGame() {
     const gameMode = 'zk_ranked';
-    console.log('[Cosmic Coder] Mode selected: ZK Ranked');
+    console.log('[ByteSurvivor] Mode selected: ZK Ranked');
     Audio.playLevelUp();
-    window.VIBE_CODER.reset();
+    window.BYTE_SURVIVOR.reset();
     SaveManager.clearSave();
     this.menuBlocked = true;
     this.showStartupLoadingOverlay('Preparing ranked match...');
@@ -3600,9 +3600,9 @@ export default class TitleScene extends Phaser.Scene {
    */
   startCasualGame() {
     const gameMode = 'casual';
-    console.log('[Cosmic Coder] Mode selected: Casual');
+    console.log('[ByteSurvivor] Mode selected: Casual');
     Audio.playLevelUp();
-    window.VIBE_CODER.reset();
+    window.BYTE_SURVIVOR.reset();
     SaveManager.clearSave();
     this.menuBlocked = true;
     this.showStartupLoadingOverlay('Loading arena...');
@@ -3693,7 +3693,7 @@ export default class TitleScene extends Phaser.Scene {
     this.settingsMenuOpen = true;
     this.settingsSelectedIndex = 0;
 
-    const settings = window.VIBE_SETTINGS;
+    const settings = window.BYTE_SURVIVOR_SETTINGS;
     const isElectron = window.electronAPI?.isElectron;
     const cx = this.scale.width / 2;
     const cy = this.scale.height / 2;
@@ -3935,7 +3935,7 @@ export default class TitleScene extends Phaser.Scene {
 
   showNameInput(isFirstTime = false, callback = null) {
     this.nameInputOpen = true;
-    let currentName = (window.VIBE_SETTINGS && window.VIBE_SETTINGS.playerName) ? window.VIBE_SETTINGS.playerName : '';
+    let currentName = (window.BYTE_SURVIVOR_SETTINGS && window.BYTE_SURVIVOR_SETTINGS.playerName) ? window.BYTE_SURVIVOR_SETTINGS.playerName : '';
     const maxLength = 20;
 
     const w = this.scale.width || 800;
@@ -4047,7 +4047,7 @@ export default class TitleScene extends Phaser.Scene {
 
     const confirmName = () => {
       const name = currentName.trim();
-      window.VIBE_SETTINGS.setPlayerName(name);
+      window.BYTE_SURVIVOR_SETTINGS.setPlayerName(name);
       if (authApi.getStoredToken()) {
         authApi.updateMeUsername(name.slice(0, 64)).then(() => {
           if (this.updateWalletButton) this.updateWalletButton();
@@ -4110,13 +4110,13 @@ export default class TitleScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5, 0).setDepth(1002);
 
-    const currencyText = this.add.text(overlayLeft + boxW - padding, titleY + 2, `${t('upgrades.bits')}: ${window.VIBE_UPGRADES.currency}`, {
+    const currencyText = this.add.text(overlayLeft + boxW - padding, titleY + 2, `${t('upgrades.bits')}: ${window.BYTE_SURVIVOR_UPGRADES.currency}`, {
       fontFamily: '"Segoe UI", system-ui, sans-serif',
       fontSize: `${13 * uiScale}px`,
       color: '#ffd700'
     }).setOrigin(1, 0).setDepth(1002);
 
-    const upgradeKeys = Object.keys(window.VIBE_UPGRADES.upgrades);
+    const upgradeKeys = Object.keys(window.BYTE_SURVIVOR_UPGRADES.upgrades);
     const upgradeTexts = [];
     const listX = overlayLeft + padding;
     const listMaxWidth = boxW - padding * 2 - 16;
@@ -4132,14 +4132,14 @@ export default class TitleScene extends Phaser.Scene {
     };
 
     upgradeKeys.forEach((key, index) => {
-      const upgrade = window.VIBE_UPGRADES.upgrades[key];
-      const level = window.VIBE_UPGRADES.levels[key] || 0;
-      const cost = window.VIBE_UPGRADES.getCost(key);
+      const upgrade = window.BYTE_SURVIVOR_UPGRADES.upgrades[key];
+      const level = window.BYTE_SURVIVOR_UPGRADES.levels[key] || 0;
+      const cost = window.BYTE_SURVIVOR_UPGRADES.getCost(key);
       const maxed = level >= upgrade.maxLevel;
 
       const levelBar = buildLevelBar(level, upgrade.maxLevel);
       const costStr = maxed ? t('upgrades.maxed') : `${cost} ${t('upgrades.bits')}`;
-      const canAfford = window.VIBE_UPGRADES.currency >= cost && !maxed;
+      const canAfford = window.BYTE_SURVIVOR_UPGRADES.currency >= cost && !maxed;
       const name = t('upgrade_names.' + key);
       const desc = t('upgrade_descs.' + key);
       const paddedName = name.padEnd(namePadLen, ' ');
@@ -4178,11 +4178,11 @@ export default class TitleScene extends Phaser.Scene {
     // Update visuals function
     const updateVisuals = () => {
       upgradeTexts.forEach((item, index) => {
-        const upgrade = window.VIBE_UPGRADES.upgrades[item.key];
-        const level = window.VIBE_UPGRADES.levels[item.key] || 0;
-        const cost = window.VIBE_UPGRADES.getCost(item.key);
+        const upgrade = window.BYTE_SURVIVOR_UPGRADES.upgrades[item.key];
+        const level = window.BYTE_SURVIVOR_UPGRADES.levels[item.key] || 0;
+        const cost = window.BYTE_SURVIVOR_UPGRADES.getCost(item.key);
         const maxed = level >= upgrade.maxLevel;
-        item.canAfford = window.VIBE_UPGRADES.currency >= cost && !maxed;
+        item.canAfford = window.BYTE_SURVIVOR_UPGRADES.currency >= cost && !maxed;
         item.maxed = maxed;
 
         const levelBar = buildLevelBar(level, upgrade.maxLevel);
@@ -4201,7 +4201,7 @@ export default class TitleScene extends Phaser.Scene {
       });
 
       selector.setY(startY + this.upgradeSelectedIndex * spacing);
-      currencyText.setText(`${t('upgrades.bits')}: ${window.VIBE_UPGRADES.currency}`);
+      currencyText.setText(`${t('upgrades.bits')}: ${window.BYTE_SURVIVOR_UPGRADES.currency}`);
     };
 
     // Input handlers
@@ -4222,7 +4222,7 @@ export default class TitleScene extends Phaser.Scene {
     const purchase = () => {
       const item = upgradeTexts[this.upgradeSelectedIndex];
       if (item.canAfford) {
-        window.VIBE_UPGRADES.purchase(item.key);
+        window.BYTE_SURVIVOR_UPGRADES.purchase(item.key);
         Audio.playLevelUp();
         updateVisuals();
       } else {
@@ -4326,8 +4326,8 @@ export default class TitleScene extends Phaser.Scene {
     const contentElements = [];
 
     // Get weapon data
-    const legendaries = window.VIBE_LEGENDARIES;
-    const melee = window.VIBE_MELEE;
+    const legendaries = window.BYTE_SURVIVOR_LEGENDARIES;
+    const melee = window.BYTE_SURVIVOR_MELEE;
 
     // Ranged weapons from ArenaScene weaponTypes
     const rangedWeapons = {
@@ -4957,8 +4957,8 @@ export default class TitleScene extends Phaser.Scene {
 
   showCharacterSelect() {
     this.characterMenuOpen = true;
-    const CHAR_IDS = ['vibecoder', 'destroyer', 'swordsman'];
-    let selectedIndex = CHAR_IDS.indexOf(progressStore.selectedCharacter || window.VIBE_SELECTED_CHARACTER || 'vibecoder');
+    const CHAR_IDS = ['bytesurvivor', 'destroyer', 'swordsman'];
+    let selectedIndex = CHAR_IDS.indexOf(progressStore.selectedCharacter || window.BYTE_SURVIVOR_SELECTED_CHARACTER || 'bytesurvivor');
     if (selectedIndex < 0) selectedIndex = 0;
 
     const uiScale = getUIScale(this);
@@ -4987,7 +4987,7 @@ export default class TitleScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1002);
 
     // Nombre completo del personaje (centrado debajo del título, con menos espacio)
-    const previewName = this.add.text(cx, overlayTop + 65 * uiScale, 'VibeCoder', {
+    const previewName = this.add.text(cx, overlayTop + 65 * uiScale, 'ByteSurvivor', {
       fontFamily: '"Segoe UI", system-ui, sans-serif',
       fontSize: `${22 * uiScale}px`,
       color: '#ffffff',
@@ -5045,9 +5045,9 @@ export default class TitleScene extends Phaser.Scene {
     const updatePreview = () => {
       const charId = CHAR_IDS[selectedIndex];
       const fallbackChar = { 
-        name: 'VibeCoder', 
-        displayName: 'VibeCoder',
-        displayName_en: 'VibeCoder',
+        name: 'ByteSurvivor', 
+        displayName: 'ByteSurvivor',
+        displayName_en: 'ByteSurvivor',
         textureKey: 'player', 
         animPrefix: 'player',
         origin: 'Un ex-arquitecto de redes que descubrió que el código no solo se escribe, se siente.',
@@ -5057,8 +5057,8 @@ export default class TitleScene extends Phaser.Scene {
         mission: 'Mantener la armonía entre el hardware y el alma.',
         mission_en: 'Maintain harmony between hardware and soul.'
       };
-      const char = window.VIBE_CHARACTERS?.[charId] || window.VIBE_CHARACTERS?.vibecoder || fallbackChar;
-      const lang = window.VIBE_SETTINGS?.language || 'en';
+      const char = window.BYTE_SURVIVOR_CHARACTERS?.[charId] || window.BYTE_SURVIVOR_CHARACTERS?.bytesurvivor || fallbackChar;
+      const lang = window.BYTE_SURVIVOR_SETTINGS?.language || 'en';
       const displayName = lang === 'es' ? (char.displayName || char.name) : (char.displayName_en || char.displayName || char.name);
       previewName.setText(displayName);
       if (!this.textures.exists(char.textureKey)) {
@@ -5072,11 +5072,11 @@ export default class TitleScene extends Phaser.Scene {
       previewSprite.setVisible(true).setAlpha(1);
       previewSprite.setTexture(char.textureKey, 0);
 
-      // Check for special enabling animation (VibeCoder, Destroyer, StormMan)
+      // Check for special enabling animation (ByteSurvivor, Destroyer, StormMan)
       let enablingKey = null;
       if (charId === 'destroyer') {
         enablingKey = 'destroyer-enabling';
-      } else if (charId === 'vibecoder') {
+      } else if (charId === 'bytesurvivor') {
         enablingKey = 'robot-enabling';
       } else if (charId === 'swordsman') {
         enablingKey = 'swordsman-enabling';
@@ -5108,7 +5108,7 @@ export default class TitleScene extends Phaser.Scene {
       await selectCharacter(CHAR_IDS[selectedIndex]);
       updatePreview();
       this.refreshIdlePlayerSprite();
-      if (window.VIBE_SETTINGS?.sfxEnabled) Audio.playLevelUp();
+      if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) Audio.playLevelUp();
     };
 
     arrowLeft.on('pointerdown', () => { cycle(-1); });
@@ -5125,9 +5125,9 @@ export default class TitleScene extends Phaser.Scene {
       
       const charId = CHAR_IDS[selectedIndex];
       const fallbackChar = { 
-        name: 'VibeCoder', 
-        displayName: 'VibeCoder',
-        displayName_en: 'VibeCoder',
+        name: 'ByteSurvivor', 
+        displayName: 'ByteSurvivor',
+        displayName_en: 'ByteSurvivor',
         textureKey: 'player', 
         animPrefix: 'player',
         origin: 'Un ex-arquitecto de redes que descubrió que el código no solo se escribe, se siente.',
@@ -5137,7 +5137,7 @@ export default class TitleScene extends Phaser.Scene {
         mission: 'Mantener la armonía entre el hardware y el alma.',
         mission_en: 'Maintain harmony between hardware and soul.'
       };
-      const char = window.VIBE_CHARACTERS?.[charId] || window.VIBE_CHARACTERS?.vibecoder || fallbackChar;
+      const char = window.BYTE_SURVIVOR_CHARACTERS?.[charId] || window.BYTE_SURVIVOR_CHARACTERS?.bytesurvivor || fallbackChar;
       
       // Create a copy of the current character sprite to animate separately
       const animatedSprite = this.add.sprite(previewSprite.x, previewSprite.y, previewSprite.texture.key, previewSprite.frame.name);
@@ -5185,7 +5185,7 @@ export default class TitleScene extends Phaser.Scene {
       const loreBoxTop = cy - loreBoxH / 2;
       
       // Título del personaje en el idioma apropiado - columna derecha
-      const lang = window.VIBE_SETTINGS?.language || 'en';
+      const lang = window.BYTE_SURVIVOR_SETTINGS?.language || 'en';
       const textStartX = (cx - loreBoxW/2) + (loreBoxW * 0.35) + 32; // Columna derecha
       const loreTitleText = lang === 'es' ? (char.displayName || char.name) : (char.displayName_en || char.displayName || char.name);
       const loreTitle = this.add.text(textStartX, cy - loreBoxH/2 + 40, loreTitleText, {
@@ -5305,7 +5305,7 @@ export default class TitleScene extends Phaser.Scene {
         selectedIndex = (selectedIndex + dir + CHAR_IDS.length) % CHAR_IDS.length;
         selectCharacter(CHAR_IDS[selectedIndex]).then(() => {
           updatePreview();
-          if (window.VIBE_SETTINGS?.sfxEnabled) Audio.playLevelUp();
+          if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) Audio.playLevelUp();
           showCharacterLore();
         });
       };

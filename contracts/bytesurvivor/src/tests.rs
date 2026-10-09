@@ -12,7 +12,7 @@ use soroban_sdk::{
 };
 use zk_types::{ZkProof, ZkVerificationKey, G1_SIZE, G2_SIZE, FR_SIZE};
 
-use crate::{CosmicCoder, CosmicCoderClient, PlayerMilestone};
+use crate::{ByteSurvivor, ByteSurvivorClient, PlayerMilestone};
 use groth16_verifier::{Groth16Verifier, Groth16VerifierClient};
 
 #[contract]
@@ -99,8 +99,8 @@ fn test_submit_zk_fails_when_verifier_not_set() {
     env.mock_all_auths();
 
     let hub = env.register(MockHub, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     let invalid_verifier = Address::generate(&env);
     policy_client.init(&hub, &invalid_verifier);
@@ -130,8 +130,8 @@ fn test_submit_zk_anti_replay() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     policy_client.init(&hub, &verifier);
 
@@ -181,8 +181,8 @@ fn test_submit_zk_invalid_proof_verifier_error() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     policy_client.init(&hub, &verifier);
 
@@ -221,8 +221,8 @@ fn test_submit_zk_invalid_input_score_below_min() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     policy_client.init(&hub, &verifier);
     let player = Address::generate(&env);
@@ -252,8 +252,8 @@ fn test_submit_zk_invalid_input_zero_score() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     policy_client.init(&hub, &verifier);
     let player = Address::generate(&env);
@@ -282,8 +282,8 @@ fn test_submit_zk_valid_updates_nonce_leaderboard_and_emits_event() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
 
     policy_client.init(&hub, &verifier);
 
@@ -389,8 +389,8 @@ fn test_real_proof_verifier_and_submit_zk() {
     assert!(ok, "real proof must verify to true");
 
     let hub = env.register(MockHub, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
     policy_client.init(&hub, &verifier);
 
     let player = Address::generate(&env);
@@ -420,8 +420,8 @@ fn test_player_milestone_default_zero() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
     policy_client.init(&hub, &verifier);
 
     let player = Address::generate(&env);
@@ -437,8 +437,8 @@ fn test_player_milestone_updates_from_verified_submits() {
 
     let hub = env.register(MockHub, ());
     let verifier = env.register(Groth16Verifier, ());
-    let policy = env.register(CosmicCoder, ());
-    let policy_client = CosmicCoderClient::new(&env, &policy);
+    let policy = env.register(ByteSurvivor, ());
+    let policy_client = ByteSurvivorClient::new(&env, &policy);
     policy_client.init(&hub, &verifier);
 
     let player = Address::generate(&env);

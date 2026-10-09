@@ -30,7 +30,7 @@ function createWindow() {
     y: bounds.y,
     minWidth: 400,
     minHeight: 300,
-    title: 'Cosmic Coder',
+    title: 'ByteSurvivor',
     icon: path.join(__dirname, '../public/assets/sprites/player.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

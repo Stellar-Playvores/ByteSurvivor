@@ -1,12 +1,12 @@
 /**
  * Leaderboard persistence in Supabase.
- * Table: cosmic_coder_leaderboard (address, name, score, wave, games_played, updated_at)
+ * Table: bytesurvivor_leaderboard (address, name, score, wave, games_played, updated_at)
  * Fallback to in-memory is handled in server/index.js.
  */
 
 import { getSupabase } from './supabase.js';
 
-export const LEADERBOARD_TABLE = 'cosmic_coder_leaderboard';
+export const LEADERBOARD_TABLE = 'bytesurvivor_leaderboard';
 const MAX_ENTRIES = 50;
 
 function leaderboardSort(a, b) {

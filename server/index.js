@@ -20,6 +20,14 @@ import { rpc } from '@stellar/stellar-sdk';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
+const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
+
+function normalizeCharId(id) {
+  const resolved = LEGACY_CHARS[id] ?? id;
+  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+}
+
 const app = express();
 
 // --- Middleware ---
@@ -151,7 +159,7 @@ app.get('/player/:address/progress', async (req, res) => {
     });
   }
   const data = playerProgress.get(address);
-  if (!data) return res.status(200).json({ upgrades: null, legendaries: null, highWave: 0, highScore: 0, saveState: null, selectedCharacter: 'vibecoder' });
+  if (!data) return res.status(200).json({ upgrades: null, legendaries: null, highWave: 0, highScore: 0, saveState: null, selectedCharacter: 'bytesurvivor' });
   res.status(200).json(data);
 });
 
@@ -159,8 +167,7 @@ app.post('/player/:address/progress', async (req, res) => {
   const address = String(req.params.address || '').trim().slice(0, 56);
   if (!address) return res.status(400).json({ error: 'address required' });
   const { upgrades, legendaries, highWave, highScore, saveState, selectedCharacter } = req.body || {};
-  const validChars = ['vibecoder', 'destroyer', 'swordsman'];
-  const char = validChars.includes(selectedCharacter) ? selectedCharacter : 'vibecoder';
+  const char = normalizeCharId(selectedCharacter);
   const data = {
     upgrades: upgrades && typeof upgrades === 'object' ? upgrades : null,
     legendaries: legendaries && typeof legendaries === 'object' ? legendaries : null,

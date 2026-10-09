@@ -2,17 +2,19 @@
  * LeaderboardManager - Single on-chain/API leaderboard (no local/Anonymous list).
  * Submit and fetch from backend API (Stellar address = identity). Everyone can view
  * the same leaderboard without logging in. Backend should persist to Supabase so
- * results are always active (see docs/SUPABASE_COSMIC_CODER_SETUP.md).
+ * results are always active (see docs/SUPABASE_BYTE_SURVIVOR_SETUP.md).
  */
-const STORAGE_KEY = 'cosmicCoderLeaderboard';
-const LOCAL_GAMES_KEY = 'cosmicCoderGamesPlayed';
+const STORAGE_KEY = 'byteSurvivorLeaderboard';
+const LEGACY_STORAGE_KEY = 'cosmicCoderLeaderboard';
+const LOCAL_GAMES_KEY = 'byteSurvivorGamesPlayed';
+const LEGACY_LOCAL_GAMES_KEY = 'cosmicCoderGamesPlayed';
 const MAX_ENTRIES = 10;
 
 function getLeaderboardApiUrl() {
   if (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_LEADERBOARD_URL) return window.__VITE_CONFIG__.VITE_LEADERBOARD_URL.replace(/\/$/, '');
   if (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_API_URL) return window.__VITE_CONFIG__.VITE_API_URL.replace(/\/$/, '');
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_LEADERBOARD_URL) return import.meta.env.VITE_LEADERBOARD_URL;
-  return 'https://cosmic-coder-zk-prover.onrender.com';
+  return 'https://bytesurvivor-zk-prover.onrender.com';
 }
 
 function shortAddress(address, chars = 8) {
@@ -27,7 +29,7 @@ export default class LeaderboardManager {
    */
   static load() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
         return Array.isArray(data) ? data : [];
@@ -50,6 +52,7 @@ export default class LeaderboardManager {
   static reset() {
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
     } catch (e) {
       console.warn('Leaderboard reset failed:', e);
     }
@@ -164,7 +167,7 @@ export default class LeaderboardManager {
   static getLocalGamesPlayed(address) {
     if (!address) return 0;
     try {
-      const raw = localStorage.getItem(LOCAL_GAMES_KEY);
+      const raw = localStorage.getItem(LOCAL_GAMES_KEY) ?? localStorage.getItem(LEGACY_LOCAL_GAMES_KEY);
       const map = raw ? JSON.parse(raw) : {};
       const count = map[String(address)];
       return typeof count === 'number' && count >= 0 ? count : 0;
@@ -180,7 +183,7 @@ export default class LeaderboardManager {
   static incrementLocalGamesPlayed(address) {
     if (!address) return;
     try {
-      const raw = localStorage.getItem(LOCAL_GAMES_KEY);
+      const raw = localStorage.getItem(LOCAL_GAMES_KEY) ?? localStorage.getItem(LEGACY_LOCAL_GAMES_KEY);
       const map = raw ? JSON.parse(raw) : {};
       const key = String(address);
       map[key] = (map[key] ?? 0) + 1;

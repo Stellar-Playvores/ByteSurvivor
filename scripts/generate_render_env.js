@@ -11,7 +11,7 @@ import { randomBytes } from 'crypto';
 const keypair = Keypair.random();
 const jwtSecret = randomBytes(32).toString('hex');
 
-const internalDbUrl = 'postgresql://cosmic_coder_user:sWRwCB4Xhiz3hVMiLfHfKqltmhYnTkz8@dpg-d6b4c0khncsc7386o3fg-a/cosmic_coder';
+const internalDbUrl = 'postgresql://bytesurvivor_user:sWRwCB4Xhiz3hVMiLfHfKqltmhYnTkz8@dpg-d6b4c0khncsc7386o3fg-a/bytesurvivor';
 
 const content = `# Copia estas variables al Environment del backend en Render (Dashboard → Service → Environment).
 # NO subas este archivo a git (está en .gitignore).
@@ -20,9 +20,9 @@ DATABASE_URL=${internalDbUrl}
 SEP10_SERVER_SECRET_KEY=${keypair.secret()}
 JWT_SECRET=${jwtSecret}
 SEP10_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
-SEP10_HOME_DOMAIN=cosmiccoder.app
-# Cuando despliegues, cambia a la URL real del backend, ej: https://cosmic-coder-api.onrender.com
-SEP10_WEB_AUTH_DOMAIN=cosmiccoder.app
+SEP10_HOME_DOMAIN=bytesurvivor.app
+# Cuando despliegues, cambia a la URL real del backend, ej: https://bytesurvivor-api.onrender.com
+SEP10_WEB_AUTH_DOMAIN=bytesurvivor.app
 `;
 
 const path = '.render.env.local';

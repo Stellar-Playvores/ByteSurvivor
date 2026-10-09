@@ -24,9 +24,9 @@ if (typeof globalThis !== 'undefined' && !globalThis.Buffer) {
 }
 
 // Sync selected character from progressStore on startup
-window.VIBE_SELECTED_CHARACTER = progressStore.selectedCharacter || 'vibecoder';
+window.BYTE_SURVIVOR_SELECTED_CHARACTER = progressStore.selectedCharacter || 'bytesurvivor';
 
-// Persist progress to API when wallet connected (called by VIBE_UPGRADES.save, VIBE_LEGENDARIES.save)
+// Persist progress to API when wallet connected (called by BYTE_SURVIVOR_UPGRADES.save, BYTE_SURVIVOR_LEGENDARIES.save)
 window.walletProgressPersist = () => { persistIfWalletConnected(); };
 
 const config = {
@@ -85,10 +85,10 @@ if (!checkWebGLSupport()) {
 
 function getStatusOverlay() {
   if (typeof document === 'undefined') return null;
-  let el = document.getElementById('vibe-status-overlay');
+  let el = document.getElementById('byte-survivor-status-overlay');
   if (el) return el;
   el = document.createElement('div');
-  el.id = 'vibe-status-overlay';
+  el.id = 'byte-survivor-status-overlay';
   el.style.position = 'fixed';
   el.style.left = '12px';
   el.style.bottom = '12px';
@@ -115,7 +115,7 @@ function setOverlayText(text) {
 }
 
 // Meta-progression upgrades (persistent across runs)
-window.VIBE_UPGRADES = {
+window.BYTE_SURVIVOR_UPGRADES = {
   // Upgrade definitions: { name, description, maxLevel, costBase, costScale, effect }
   upgrades: {
     damage: { name: 'DAMAGE+', desc: '+10% damage per level', maxLevel: 10, costBase: 100, costScale: 1.5, effect: 0.1 },
@@ -184,10 +184,10 @@ window.VIBE_UPGRADES = {
 };
 
 // Initialize upgrades (empty until wallet connects and loads from API)
-window.VIBE_UPGRADES.loadDefaults();
+window.BYTE_SURVIVOR_UPGRADES.loadDefaults();
 
 // Legendary weapons - permanent unlocks that persist forever
-window.VIBE_LEGENDARIES = {
+window.BYTE_SURVIVOR_LEGENDARIES = {
   // Legendary weapon definitions
   weapons: {
     huntersWarglaive: {
@@ -288,14 +288,14 @@ window.VIBE_LEGENDARIES = {
 };
 
 // Initialize legendaries (empty until wallet connects and loads from API)
-window.VIBE_LEGENDARIES.loadDefaults();
+window.BYTE_SURVIVOR_LEGENDARIES.loadDefaults();
 
-// Character selector - VibeCoder (default), VoidNull, SyncStorm
-window.VIBE_CHARACTERS = {
-  vibecoder: { 
-    name: 'VibeCoder', 
-    displayName: 'VibeCoder',
-    displayName_en: 'VibeCoder',
+// Character selector - ByteSurvivor (default), VoidNull, SyncStorm
+window.BYTE_SURVIVOR_CHARACTERS = {
+  bytesurvivor: { 
+    name: 'ByteSurvivor', 
+    displayName: 'ByteSurvivor',
+    displayName_en: 'ByteSurvivor',
     textureKey: 'player', 
     animPrefix: 'player',
     origin: 'Un ex-arquitecto de redes que descubrió que el código no solo se escribe, se siente.',
@@ -333,10 +333,10 @@ window.VIBE_CHARACTERS = {
   }
 };
 // Selected character id (set by wallet progress or default)
-window.VIBE_SELECTED_CHARACTER = 'vibecoder';
+window.BYTE_SURVIVOR_SELECTED_CHARACTER = 'bytesurvivor';
 
 // Melee weapons (non-legendary, drop normally)
-window.VIBE_MELEE = {
+window.BYTE_SURVIVOR_MELEE = {
   sword: { name: 'SWORD', damage: 1.5, attackRate: 1.2, range: 50, type: 'slash', color: 0xcccccc },
   spear: { name: 'SPEAR', damage: 1.2, attackRate: 0.8, range: 80, type: 'thrust', pierces: 3, color: 0x8b4513 },
   boomerang: { name: 'BOOMERANG', damage: 1.0, attackRate: 0.6, range: 150, type: 'return', color: 0xdaa520 },
@@ -344,7 +344,7 @@ window.VIBE_MELEE = {
 };
 
 // Game settings - persisted to localStorage
-window.VIBE_SETTINGS = {
+window.BYTE_SURVIVOR_SETTINGS = {
   autoMove: true,         // Auto-move when coding is detected
   sfxEnabled: true,       // Sound effects (weapons, hits)
   musicEnabled: true,     // Background music
@@ -358,7 +358,7 @@ window.VIBE_SETTINGS = {
   language: 'en',        // 'en' | 'es' - UI language
 
   load() {
-    const saved = localStorage.getItem('vibeCoderSettings');
+    const saved = localStorage.getItem('byteSurvivorSettings') ?? localStorage.getItem('vibeCoderSettings');
     // Sin datos guardados: idioma por defecto inglés (first open = English)
     if (saved) {
       const data = JSON.parse(saved);
@@ -378,7 +378,7 @@ window.VIBE_SETTINGS = {
   },
 
   save() {
-    localStorage.setItem('vibeCoderSettings', JSON.stringify({
+    localStorage.setItem('byteSurvivorSettings', JSON.stringify({
       autoMove: this.autoMove,
       sfxEnabled: this.sfxEnabled,
       musicEnabled: this.musicEnabled,
@@ -431,10 +431,10 @@ window.VIBE_SETTINGS = {
 };
 
 // Load settings on startup
-window.VIBE_SETTINGS.load();
+window.BYTE_SURVIVOR_SETTINGS.load();
 
 // Game state - will be updated by XP events
-window.VIBE_CODER = {
+window.BYTE_SURVIVOR = {
   xp: 0,
   level: 1,
   totalXP: 0,
@@ -456,7 +456,7 @@ window.VIBE_CODER = {
     }
 
     // Apply XP gain bonus from upgrades + rebirth bonus
-    const xpBonus = window.VIBE_UPGRADES.getBonus('xpGain');
+    const xpBonus = window.BYTE_SURVIVOR_UPGRADES.getBonus('xpGain');
     const rebirthXPBonus = RebirthManager.getXPMultiplier();
     const totalMultiplier = Math.min(this.streak * xpBonus * rebirthXPBonus, 3.5);
     const multipliedXP = Math.floor(amount * totalMultiplier);
@@ -526,7 +526,7 @@ function showRotateOverlay(show) {
 }
 
 function startGame() {
-  if (window.__VIBE_GAME__) return;
+  if (window.__BYTE_SURVIVOR_GAME__) return;
   
   console.log('🎮 Iniciando juego con configuración:', config);
   setOverlayText('Starting Phaser…');
@@ -561,7 +561,7 @@ function startGame() {
       setOverlayText('Unhandled: ' + (event.reason?.message || String(event.reason || 'unknown')));
     });
     
-    window.__VIBE_GAME__ = game;
+    window.__BYTE_SURVIVOR_GAME__ = game;
   } catch (error) {
     console.error('❌ Error al iniciar el juego:', error);
     setOverlayText('Start failed: ' + (error?.message || String(error)));
@@ -625,4 +625,4 @@ window.addEventListener('xpserver-disconnected', () => {
   // No log: avoids console spam when XP server is not running
 });
 
-console.log('Cosmic Coder initialized! Ready to code and conquer.');
+console.log('ByteSurvivor initialized! Ready to code and conquer.');

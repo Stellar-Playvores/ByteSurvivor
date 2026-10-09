@@ -1,13 +1,13 @@
 # Ranked ZK system (formal): why ZK, Stellar/Soroban, contracts, and on-chain verification
 
-**Status:** normative description of the ranked pipeline for Cosmic Coder.  
+**Status:** normative description of the ranked pipeline for ByteSurvivor.  
 **Scope:** what is proven, what is verified on-chain, and how any third party can audit the result.
 
 ---
 
-## 1. Why ZK is fundamental in Cosmic Coder
+## 1. Why ZK is fundamental in ByteSurvivor
 
-Cosmic Coder runs in the **player’s browser**. This creates an unavoidable integrity problem:
+ByteSurvivor runs in the **player’s browser**. This creates an unavoidable integrity problem:
 
 - The game engine state (enemy spawns, collisions, XP gain) is not observable by the network.
 - A client can be modified to report arbitrary outcomes (e.g., “wave=999, score=9,999,999”).
@@ -70,7 +70,7 @@ Responsibilities:
 
 In “backend prover mode”, the prover is a web service. In “trustless mode”, the proof is generated locally in the browser (requires shipping circuit artifacts).
 
-### 3.3 Policy contract: `cosmic_coder`
+### 3.3 Policy contract: `bytesurvivor`
 
 Responsibilities:
 
@@ -219,7 +219,7 @@ Events are part of the transaction output and can be indexed by off-chain servic
 
 ## Appendix A — Code references in this repository
 
-- Policy contract: `contracts/cosmic_coder/src/lib.rs`
+- Policy contract: `contracts/bytesurvivor/src/lib.rs`
 - Verifier contract: `contracts/zk_verifier/src/lib.rs`
 - Shared types: `contracts/zk_types/src/lib.rs`
 - Frontend ranked submit integration: `src/scenes/ArenaScene.js`, `src/contracts/gameClient.js`

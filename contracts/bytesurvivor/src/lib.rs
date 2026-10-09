@@ -1,4 +1,4 @@
-//! Cosmic Coder - ZK-ranked survival game on Stellar.
+//! ByteSurvivor - ZK-ranked survival game on Stellar.
 //! Ranked leaderboard depends exclusively on Groth16 proof verification (BN254).
 //! Verifier and policy are separate; shared types in zk_types.
 //! ZK Plasma Rifle integration: pub_signals[6] = used_zk_weapon flag.
@@ -38,7 +38,7 @@ const NONCE_TTL_LEDGERS: u32 = 6_307_200;
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
-pub enum CosmicCoderError {
+pub enum ByteSurvivorError {
     VerifierNotSet = 1,
     Replay = 2,
     InvalidProof = 3,
@@ -147,10 +147,10 @@ pub enum DataKey {
 }
 
 #[contract]
-pub struct CosmicCoder;
+pub struct ByteSurvivor;
 
 #[contractimpl]
-impl CosmicCoder {
+impl ByteSurvivor {
     fn milestone_tier_from_wave(wave: u32) -> u32 {
         if wave >= 10 {
             3
@@ -294,7 +294,7 @@ impl CosmicCoder {
         season_id: u32,
         score: u32,
         wave: u32,
-    ) -> Result<(), CosmicCoderError> {
+    ) -> Result<(), ByteSurvivorError> {
         player.require_auth();
 
         // Diagnostic breadcrumb: submit_zk entered
@@ -308,7 +308,7 @@ impl CosmicCoder {
             .get::<DataKey, Address>(&DataKey::ZkVerifier)
         {
             Some(a) => a,
-            None => return Err(CosmicCoderError::VerifierNotSet),
+            None => return Err(ByteSurvivorError::VerifierNotSet),
         };
 
         // === 2. Validate pub_signals structure (expect 7 elements for new circuit) ===
@@ -318,11 +318,11 @@ impl CosmicCoder {
                 (Symbol::new(&env, "debug"), Symbol::new(&env, "submit_zk")),
                 Symbol::new(&env, "bad_pub_signals_len"),
             );
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
         let has_weapon_flag = true;
         if vk.ic.len() != pub_signals.len() + 1 {
-            return Err(CosmicCoderError::MalformedVk);
+            return Err(ByteSurvivorError::MalformedVk);
         }
 
         // === 3b. Convert pub_signals (Bytes) -> BytesN<32> for verifier contract ===
@@ -335,7 +335,7 @@ impl CosmicCoder {
             if b.len() != 32 {
                 env.events()
                     .publish((symbol_short!("debug"),), symbol_short!("sig_len"));
-                return Err(CosmicCoderError::InvalidInput);
+                return Err(ByteSurvivorError::InvalidInput);
             }
             let mut arr = [0u8; 32];
             for j in 0..32u32 {
@@ -348,25 +348,25 @@ impl CosmicCoder {
                     (Symbol::new(&env, "debug"), Symbol::new(&env, "submit_zk")),
                     Symbol::new(&env, "bad_pub_signal_out_of_field"),
                 );
-                return Err(CosmicCoderError::InvalidZkProof);
+                return Err(ByteSurvivorError::InvalidZkProof);
             }
             pub_signals_n.push_back(soroban_sdk::BytesN::from_array(&env, &arr));
         }
 
         // === 3. Validate inputs ===
         if score == 0 || wave == 0 {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
         let min_score = wave.saturating_mul(MIN_SCORE_PER_WAVE);
         if score < min_score {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
 
         // === 4. STRICT ANTI-REPLAY: Check nonce BEFORE calling verifier ===
         // Extract nonce from pub_signals[4] for additional validation
         let nonce_key = NonceKey { nonce };
         if env.storage().persistent().has(&nonce_key) {
-            return Err(CosmicCoderError::Replay);
+            return Err(ByteSurvivorError::Replay);
         }
         
         // Also check the full replay key
@@ -376,7 +376,7 @@ impl CosmicCoder {
             season_id,
         };
         if env.storage().persistent().has(&replay_key) {
-            return Err(CosmicCoderError::Replay);
+            return Err(ByteSurvivorError::Replay);
         }
 
         // === 5. Call Groth16 verifier ===
@@ -397,20 +397,20 @@ impl CosmicCoder {
                     (Symbol::new(&env, "debug"), Symbol::new(&env, "host_call")),
                     Symbol::new(&env, "verifier_returned_err"),
                 );
-                return Err(CosmicCoderError::VerifierError);
+                return Err(ByteSurvivorError::VerifierError);
             }
             Err(_host) => {
                 env.events().publish(
                     (Symbol::new(&env, "debug"), Symbol::new(&env, "host_call")),
                     Symbol::new(&env, "verifier_host_call_failed"),
                 );
-                return Err(CosmicCoderError::VerifierCrash);
+                return Err(ByteSurvivorError::VerifierCrash);
             }
         };
         if !is_valid {
             env.events()
                 .publish((symbol_short!("debug"),), symbol_short!("err_math"));
-            return Err(CosmicCoderError::InvalidProof);
+            return Err(ByteSurvivorError::InvalidProof);
         }
 
         // === 6. Mark nonce as used with TTL extension ===
@@ -424,13 +424,13 @@ impl CosmicCoder {
         if has_weapon_flag {
             let weapon_bytes = match pub_signals.get(6) {
                 Some(b) => b,
-                None => return Err(CosmicCoderError::InvalidInput),
+                None => return Err(ByteSurvivorError::InvalidInput),
             };
             // Check if last byte is 1 (used_zk_weapon = true).
             // Frontend sends each pub_signal as 32-byte ScVal::Bytes (not BytesN),
             // so we validate length and read the last byte.
             if weapon_bytes.len() != 32 {
-                return Err(CosmicCoderError::InvalidInput);
+                return Err(ByteSurvivorError::InvalidInput);
             }
             let used_weapon = weapon_bytes.get(31) == Some(1);
             
@@ -443,7 +443,7 @@ impl CosmicCoder {
         // === 8. Call end_game() on Game Hub ===
         let session: u32 = match env.storage().persistent().get::<DataKey, u32>(&DataKey::Session) {
             Some(s) => s,
-            None => return Err(CosmicCoderError::GameHubCrash),
+            None => return Err(ByteSurvivorError::GameHubCrash),
         };
         let hub_addr: Address = match env
             .storage()
@@ -451,7 +451,7 @@ impl CosmicCoder {
             .get::<DataKey, Address>(&DataKey::GameHub)
         {
             Some(a) => a,
-            None => return Err(CosmicCoderError::GameHubCrash),
+            None => return Err(ByteSurvivorError::GameHubCrash),
         };
 
         // end_game() on the hub returns () (not Result), so we must use invoke_contract
@@ -509,7 +509,7 @@ impl CosmicCoder {
         season_id: u32,
         score: u32,
         wave: u32,
-    ) -> Result<(), CosmicCoderError> {
+    ) -> Result<(), ByteSurvivorError> {
         player.require_auth();
 
         let verifier_addr: Address = match env
@@ -518,23 +518,23 @@ impl CosmicCoder {
             .get::<DataKey, Address>(&DataKey::ZkVerifier)
         {
             Some(a) => a,
-            None => return Err(CosmicCoderError::VerifierNotSet),
+            None => return Err(ByteSurvivorError::VerifierNotSet),
         };
 
         if score == 0 || wave == 0 {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
         let min_score = wave.saturating_mul(MIN_SCORE_PER_WAVE);
         if score < min_score {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
         if run_hash.len() != 32 || proof_blob.len() == 0 {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
 
         let nonce_key = NonceKey { nonce };
         if env.storage().persistent().has(&nonce_key) {
-            return Err(CosmicCoderError::Replay);
+            return Err(ByteSurvivorError::Replay);
         }
         let replay_key = ReplayKey {
             player: player.clone(),
@@ -542,7 +542,7 @@ impl CosmicCoder {
             season_id,
         };
         if env.storage().persistent().has(&replay_key) {
-            return Err(CosmicCoderError::Replay);
+            return Err(ByteSurvivorError::Replay);
         }
 
         let verifier_result = env.try_invoke_contract::<soroban_sdk::BytesN<32>, UltraHonkError>(
@@ -552,8 +552,8 @@ impl CosmicCoder {
         );
         let _proof_id = match verifier_result {
             Ok(Ok(pid)) => pid,
-            Ok(Err(_)) => return Err(CosmicCoderError::VerifierError),
-            Err(_) => return Err(CosmicCoderError::VerifierCrash),
+            Ok(Err(_)) => return Err(ByteSurvivorError::VerifierError),
+            Err(_) => return Err(ByteSurvivorError::VerifierCrash),
         };
 
         env.storage().persistent().set(&nonce_key, &true);
@@ -563,7 +563,7 @@ impl CosmicCoder {
 
         let session: u32 = match env.storage().persistent().get::<DataKey, u32>(&DataKey::Session) {
             Some(s) => s,
-            None => return Err(CosmicCoderError::GameHubCrash),
+            None => return Err(ByteSurvivorError::GameHubCrash),
         };
         let hub_addr: Address = match env
             .storage()
@@ -571,7 +571,7 @@ impl CosmicCoder {
             .get::<DataKey, Address>(&DataKey::GameHub)
         {
             Some(a) => a,
-            None => return Err(CosmicCoderError::GameHubCrash),
+            None => return Err(ByteSurvivorError::GameHubCrash),
         };
         env.invoke_contract::<()>(
             &hub_addr,
@@ -733,12 +733,12 @@ impl CosmicCoder {
         vk: ZkVerificationKey,
         pub_signals: Vec<soroban_sdk::BytesN<32>>,
         threshold: u32,
-    ) -> Result<(), CosmicCoderError> {
+    ) -> Result<(), ByteSurvivorError> {
         player.require_auth();
 
         // Verify weapon_id is valid (1-5)
         if weapon_id < 1 || weapon_id > 5 {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
 
         // Verify threshold matches weapon_id
@@ -748,28 +748,28 @@ impl CosmicCoder {
             3 => 5000u32,
             4 => 10000u32,
             5 => 20000u32,
-            _ => return Err(CosmicCoderError::InvalidInput),
+            _ => return Err(ByteSurvivorError::InvalidInput),
         };
         if threshold != expected_threshold {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
 
         // Check if already unlocked
         let unlock_key = WeaponUnlockKey { player: player.clone(), weapon_id };
         let already_unlocked: bool = env.storage().persistent().get(&unlock_key).unwrap_or(false);
         if already_unlocked {
-            return Err(CosmicCoderError::InvalidInput);
+            return Err(ByteSurvivorError::InvalidInput);
         }
 
         // Get verifier
         let verifier: Address = match env.storage().persistent().get::<DataKey, Address>(&DataKey::ZkVerifier) {
             Some(a) => a,
-            None => return Err(CosmicCoderError::VerifierNotSet),
+            None => return Err(ByteSurvivorError::VerifierNotSet),
         };
 
         // Verify ZK proof
         if vk.ic.len() != pub_signals.len() + 1 {
-            return Err(CosmicCoderError::MalformedVk);
+            return Err(ByteSurvivorError::MalformedVk);
         }
 
         let raw = env.try_invoke_contract::<bool, Groth16Error>(
@@ -784,11 +784,11 @@ impl CosmicCoder {
         );
         let ok = match raw {
             Ok(Ok(b)) => b,
-            Ok(Err(_)) => return Err(CosmicCoderError::VerifierError),
-            Err(_) => return Err(CosmicCoderError::VerifierError),
+            Ok(Err(_)) => return Err(ByteSurvivorError::VerifierError),
+            Err(_) => return Err(ByteSurvivorError::VerifierError),
         };
         if !ok {
-            return Err(CosmicCoderError::InvalidProof);
+            return Err(ByteSurvivorError::InvalidProof);
         }
 
         // Mark weapon as unlocked

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Vibe Coder XP Hook for Cursor AI
+# ByteSurvivor XP Hook for Cursor AI
 #
 # Usage: Integrate with Cursor's extension system or run manually
 # Example: ./cursor-hook.sh "code completion"
@@ -11,7 +11,7 @@ else
   ACTION=$(cat)
 fi
 
-# Send to Vibe Coder server
+# Send to ByteSurvivor server
 curl -s -X POST http://localhost:3333/cli/cursor \
   -H "Content-Type: application/json" \
   -d "{\"action\": \"cursor_activity\", \"data\": {\"action\": \"$ACTION\"}}" \
@@ -19,5 +19,5 @@ curl -s -X POST http://localhost:3333/cli/cursor \
   --max-time 2 \
   > /dev/null 2>&1 &
 
-echo "Cursor XP sent to Vibe Coder!"
+echo "Cursor XP sent to ByteSurvivor!"
 exit 0

@@ -32,7 +32,7 @@ export function createTray(settings, toggleWindowFn, quitFn, setWindowModeFn, to
   const iconPaths = [
     path.join(__dirname, '../build/icon.png'),
     path.join(__dirname, '../public/assets/sprites/player.png'),
-    path.join(__dirname, '../public/assets/sprites/player/vibe-coder-idle.png')
+    path.join(__dirname, '../public/assets/sprites/player/bytesurvivor-idle.png')
   ];
 
   let trayIcon = null;
@@ -72,7 +72,7 @@ export function createTray(settings, toggleWindowFn, quitFn, setWindowModeFn, to
 
   try {
     trayInstance = new Tray(trayIcon);
-    trayInstance.setToolTip('Cosmic Coder');
+    trayInstance.setToolTip('ByteSurvivor');
     console.log('[Tray] Created successfully');
 
     // Set up click handlers
@@ -140,7 +140,7 @@ export function updateTrayMenu(tray, mainWindow, settings, quitFn) {
         mainWindow?.focus();
       }},
       { type: 'separator' },
-      { label: 'Quit Cosmic Coder', click: quitFn || callbacks.quitFn }
+      { label: 'Quit ByteSurvivor', click: quitFn || callbacks.quitFn }
     ];
   } else {
     // Minimal mode: just show/hide and quit

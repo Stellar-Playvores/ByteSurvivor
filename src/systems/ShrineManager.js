@@ -350,13 +350,13 @@ export default class ShrineManager {
     if (!cost || cost.type === 'free') return true;
 
     const player = this.scene.player;
-    const vibeState = window.VIBE_CODER;
+    const survivorState = window.BYTE_SURVIVOR;
 
     switch (cost.type) {
       case 'health':
         return player.health > player.maxHealth * cost.amount;
       case 'xp':
-        return vibeState.totalXP >= cost.amount;
+        return survivorState.totalXP >= cost.amount;
       case 'weapon':
         return this.scene.currentWeapon && this.scene.currentWeapon.type !== 'basic';
       default:
@@ -372,7 +372,7 @@ export default class ShrineManager {
     if (!cost || cost.type === 'free') return;
 
     const player = this.scene.player;
-    const vibeState = window.VIBE_CODER;
+    const survivorState = window.BYTE_SURVIVOR;
 
     switch (cost.type) {
       case 'health':
@@ -380,7 +380,7 @@ export default class ShrineManager {
         this.scene.updateHUD();
         break;
       case 'xp':
-        vibeState.totalXP -= cost.amount;
+        survivorState.totalXP -= cost.amount;
         break;
       case 'weapon':
         this.scene.currentWeapon = { type: 'basic' };
@@ -457,7 +457,7 @@ export default class ShrineManager {
     // Apply outcome
     switch (outcome.effect) {
       case 'jackpot_xp':
-        window.VIBE_CODER.addXP(500);
+        window.BYTE_SURVIVOR.addXP(500);
         break;
       case 'weapon_drop':
         this.scene.spawnWeaponDrop(shrine.x, shrine.y, true);
@@ -482,15 +482,15 @@ export default class ShrineManager {
    * Apply level up effect
    */
   applyLevelUp(shrine) {
-    const vibeState = window.VIBE_CODER;
-    vibeState.level++;
-    vibeState.xp = 0;
+    const survivorState = window.BYTE_SURVIVOR;
+    survivorState.level++;
+    survivorState.xp = 0;
 
     this.showMessage('LEVEL UP!', shrine.x, shrine.y, '#00ff88');
 
     // Show level up effects
     if (this.scene.showLevelUp) {
-      this.scene.showLevelUp(vibeState.level);
+      this.scene.showLevelUp(survivorState.level);
     }
   }
 

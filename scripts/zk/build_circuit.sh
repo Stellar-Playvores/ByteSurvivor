@@ -55,7 +55,7 @@ if [ ! -f "$PTAU_FILE" ] || [ "$(stat -f%z "$PTAU_FILE" 2>/dev/null || stat -c%s
   echo "Download failed or invalid; generating powers of tau locally (this may take a minute)..."
   rm -f "$PTAU_FILE" "$BUILD_DIR/pot12_0000.ptau" "$BUILD_DIR/pot12_0001.ptau"
   snarkjs powersoftau new bn128 12 "$BUILD_DIR/pot12_0000.ptau"
-  echo "random" | snarkjs powersoftau contribute "$BUILD_DIR/pot12_0000.ptau" "$BUILD_DIR/pot12_0001.ptau" --name="cosmic"
+  echo "random" | snarkjs powersoftau contribute "$BUILD_DIR/pot12_0000.ptau" "$BUILD_DIR/pot12_0001.ptau" --name="bytesurvivor"
   snarkjs powersoftau prepare phase2 "$BUILD_DIR/pot12_0001.ptau" "$PTAU_FILE"
 fi
 
@@ -70,7 +70,7 @@ for CIRCUIT_NAME in "${CIRCUITS[@]}"; do
   echo "=========================================="
   
   snarkjs groth16 setup "$BUILD_DIR/${CIRCUIT_NAME}.r1cs" "$PTAU_FILE" "$BUILD_DIR/${CIRCUIT_NAME}_0000.zkey"
-  echo "random" | snarkjs zkey contribute "$BUILD_DIR/${CIRCUIT_NAME}_0000.zkey" "$BUILD_DIR/${CIRCUIT_NAME}_final.zkey" --name="cosmic"
+  echo "random" | snarkjs zkey contribute "$BUILD_DIR/${CIRCUIT_NAME}_0000.zkey" "$BUILD_DIR/${CIRCUIT_NAME}_final.zkey" --name="bytesurvivor"
   snarkjs zkey export verificationkey "$BUILD_DIR/${CIRCUIT_NAME}_final.zkey" "$BUILD_DIR/${CIRCUIT_NAME}_vkey.json"
 done
 

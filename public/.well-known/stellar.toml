@@ -4,5 +4,5 @@ VERSION = "2.0.0"
 SIGNING_KEY = "REPLACE_WITH_SEP10_SIGNING_PUBLIC_KEY"
 
 # Standard SEP-10 endpoint (must support GET and POST on same path).
-WEB_AUTH_ENDPOINT = "https://cosmic-coder.onrender.com/auth"
+WEB_AUTH_ENDPOINT = "https://bytesurvivor.onrender.com/auth"
 

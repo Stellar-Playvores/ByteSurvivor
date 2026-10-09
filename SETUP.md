@@ -1,6 +1,6 @@
-# 🎮 Vibe Coder Setup Guide
+# 🎮 ByteSurvivor Setup Guide
 
-This guide will help you connect Vibe Coder to your coding workflow so you earn XP while you code!
+This guide will help you connect ByteSurvivor to your coding workflow so you earn XP while you code!
 
 ---
 
@@ -8,7 +8,7 @@ This guide will help you connect Vibe Coder to your coding workflow so you earn 
 
 Just want to try the game? No setup needed!
 
-1. Visit the **[Live Demo](https://klorenn.github.io/Cosmic-Coder-/)**
+1. Visit the **[live game](https://stellar-playvores.github.io/ByteSurvivor/)**
 2. Press **SPACE** to manually gain XP
 3. Use **WASD** or **Arrow Keys** to move
 
@@ -24,8 +24,8 @@ Just want to try the game? No setup needed!
 ### Step 1: Clone & Install
 
 ```bash
-git clone https://github.com/Klorenn/Cosmic-Coder-.git
-cd vibe-coder
+git clone https://github.com/Stellar-Playvores/ByteSurvivor.git
+cd ByteSurvivor
 npm install
 ```
 
@@ -93,7 +93,7 @@ curl -X POST http://localhost:3333 \
                                                           │
                                                           ▼
                                                   ┌─────────────────┐
-                                                  │   Vibe Coder    │
+                                                  │   ByteSurvivor  │
                                                   │   (the game)    │
                                                   └─────────────────┘
 ```
@@ -211,7 +211,7 @@ The hooks just make it more fun by rewarding your real coding! 🚀
 
 ## Need Help?
 
-- Open an issue on [GitHub](https://github.com/Klorenn/Cosmic-Coder-/issues)
+- Open an issue on [GitHub](https://github.com/Stellar-Playvores/ByteSurvivor/issues)
 - Check the [README](./README.md) for feature overview
 - See [CHANGELOG](./CHANGELOG.md) for version history
 

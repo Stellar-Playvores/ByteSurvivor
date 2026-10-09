@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Cosmic Coder XP Server
+// ByteSurvivor XP Server
 // Receives XP events from CLI hooks via HTTP and broadcasts to game via WebSocket
 
 import http from 'http';
@@ -96,7 +96,7 @@ function getSourceColor(source) {
 server.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
-║     🎮 COSMIC CODER XP SERVER              ║
+║     🎮 BYTE SURVIVOR XP SERVER             ║
 ║                                           ║
 ║     WebSocket: ws://localhost:${PORT}       ║
 ║     HTTP POST: http://localhost:${PORT}     ║

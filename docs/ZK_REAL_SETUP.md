@@ -1,50 +1,50 @@
-# ZK Real Proof Setup (Cosmic Coder)
+# ZK Real Proof Setup (ByteSurvivor)
 
-Guía para compilar el circuito Circom, generar VK/proof real y usarlos con `zk_verifier` y `submit_zk`.
+Guide to compile the Circom circuit, generate a real VK/proof, and use them with `zk_verifier` and `submit_zk`.
 
-## Requisitos
+## Requirements
 
 - **Node** 18+
-- **circom** 2.1.x — [Instalación](https://docs.circom.io/getting-started/installation/)
+- **circom** 2.1.x — [Installation](https://docs.circom.io/getting-started/installation/)
 - **snarkjs** — `npm i -g snarkjs`
-- **Rust + wasm32** — para contratos (ya cubierto en `contracts/README.md`)
+- **Rust + wasm32** — for contracts (already covered in `contracts/README.md`)
 
-## 1. Circuito (Circom)
+## 1. Circuit (Circom)
 
-El circuito `circuits/GameRun.circom` **valida la regla de juego**: `score >= wave * 5` (MIN_SCORE_PER_WAVE = 5). Usa `GreaterEqThan` de circomlib; una proof solo es válida si cumple la regla.
+The `circuits/GameRun.circom` circuit **validates the game rule**: `score >= wave * 5` (MIN_SCORE_PER_WAVE = 5). It uses `GreaterEqThan` from circomlib; a proof is only valid if it satisfies the rule.
 
-Tiene **6 señales públicas**:
+It has **6 public signals**:
 
-| Señal       | Uso                          |
-|------------|-------------------------------|
-| run_hash_hi| 128 bits altos de run_hash    |
-| run_hash_lo| 128 bits bajos de run_hash    |
-| score      | u32                           |
-| wave       | u32                           |
-| nonce      | u64                           |
-| season_id  | u32                           |
+| Signal      | Use                          |
+|-------------|------------------------------|
+| run_hash_hi | high 128 bits of run_hash    |
+| run_hash_lo | low 128 bits of run_hash     |
+| score       | u32                          |
+| wave        | u32                          |
+| nonce       | u64                          |
+| season_id   | u32                          |
 
-El contrato exige `vk.ic.len() == pub_signals.len() + 1`, es decir **7 elementos en `ic`** (6 señales + término constante).
+The contract requires `vk.ic.len() == pub_signals.len() + 1`, i.e. **7 elements in `ic`** (6 signals + constant term).
 
-## 2. Compilar circuito y trusted setup
+## 2. Compile the circuit and trusted setup
 
 ```bash
-# Desde repo root
+# From repo root
 chmod +x scripts/zk/build_circuit.sh
 ./scripts/zk/build_circuit.sh
 ```
 
-Esto genera en `circuits/build/`:
+This generates in `circuits/build/`:
 
 - `GameRun.r1cs`, `GameRun_js/GameRun.wasm`
 - `GameRun_final.zkey`
 - `vkey.json`
 
-Si no existe `pot12_final.ptau`, el script intenta descargarlo; si falla, hay que generar la ceremonia (ver snarkjs docs).
+If `pot12_final.ptau` doesn't exist, the script tries to download it; if that fails, you have to generate the ceremony (see snarkjs docs).
 
-## 3. Generar proof real
+## 3. Generate a real proof
 
-Crea `circuits/input.json` (o copia `input.json.example`):
+Create `circuits/input.json` (or copy `input.json.example`):
 
 ```json
 {
@@ -57,22 +57,22 @@ Crea `circuits/input.json` (o copia `input.json.example`):
 }
 ```
 
-Genera proof y exportación para contrato:
+Generate the proof and the contract export:
 
 ```bash
 node scripts/zk/generate_proof.js circuits/input.json circuits/build
 ```
 
-Salida: `circuits/build/contract_proof.json` (proof, vk y pub_signals en hex para el contrato).
+Output: `circuits/build/contract_proof.json` (proof, vk and pub_signals in hex for the contract).
 
-## 4. Verificar con el verifier (Soroban)
+## 4. Verify with the verifier (Soroban)
 
-Tras desplegar el verifier (ver [DEPLOY_ZK_STEPS.md](DEPLOY_ZK_STEPS.md); build con **wasm32v1-none**). En testnet conviene usar `--source-account <SOURCE>` en las invocaciones.
+After deploying the verifier (see [DEPLOY_ZK_STEPS.md](DEPLOY_ZK_STEPS.md); build with **wasm32v1-none**). On testnet it's best to use `--source-account <SOURCE>` in the invocations.
 
-**Referencia (Testnet):** Verifier `CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA`, Policy `CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO`.
+**Reference (Testnet):** Verifier `CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA`, Policy `CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO`.
 
 ```bash
-# Sustituir VERIFIER_ID y los valores por los de contract_proof.json
+# Replace VERIFIER_ID and the values with the ones from contract_proof.json
 stellar contract invoke --id <VERIFIER_ID> --source-account <SOURCE> --network testnet --sim-only -- \
   verify_proof \
   --vk '{"alpha":"<hex>","beta":"<hex>","gamma":"<hex>","delta":"<hex>","ic":["<hex>",...]}' \
@@ -80,43 +80,43 @@ stellar contract invoke --id <VERIFIER_ID> --source-account <SOURCE> --network t
   --pub_signals '["<hex>","<hex>",...]'
 ```
 
-Para construir los argumentos desde `contract_proof.json`:
+To build the arguments from `contract_proof.json`:
 
 ```bash
 node scripts/zk/contract_args_from_proof.js circuits/build
 ```
 
-(Se puede usar la salida para rellenar vk/proof/pub_signals en la invocación.)
+(You can use the output to fill vk/proof/pub_signals in the invocation.)
 
-## 5. Opción B: backend genera la proof (flujo integrado en el juego)
+## 5. Option B: backend generates the proof (flow integrated into the game)
 
-El servidor (`npm run server`) expone `POST /zk/prove` con body:
+The server (`npm run server`) exposes `POST /zk/prove` with body:
 
 `{ "run_hash_hex", "score", "wave", "nonce", "season_id" }`
 
-El backend escribe `circuits/build/input.json`, ejecuta `generate_proof.js` y devuelve el JSON listo para contrato. El frontend llama a `requestZkProof(proverUrl, payload)` y luego `submitZkFromProver(addr, sign, proverUrl, payload)`.
+The backend writes `circuits/build/input.json`, runs `generate_proof.js` and returns the JSON ready for the contract. The frontend calls `requestZkProof(proverUrl, payload)` and then `submitZkFromProver(addr, sign, proverUrl, payload)`.
 
-- **Variable de entorno (frontend):** `VITE_ZK_PROVER_URL` (por defecto `http://localhost:3333`). Si está definida y el contrato también, al morir en partida nueva se usa **ranked (ZK)** en lugar de casual.
-- **Requisito:** Partida nueva (no “continuar”) para tener `runSeed`; servidor con circuito compilado y `snarkjs` en PATH.
+- **Environment variable (frontend):** `VITE_ZK_PROVER_URL` (default `http://localhost:3333`). If it's defined and so is the contract, dying in a new run uses **ranked (ZK)** instead of casual.
+- **Requirement:** a new run (not "continue") to have a `runSeed`; server with the compiled circuit and `snarkjs` in PATH.
 
-## 6. submit_zk con proof real (policy)
+## 6. submit_zk with a real proof (policy)
 
-Desde el frontend (o con Stellar CLI):
+From the frontend (or with Stellar CLI):
 
-- **player**: Address del jugador (auth).
-- **proof / vk / pub_signals**: los de `contract_proof.json` (en formato ScVal; el cliente ya usa proof/vk/pubSignals).
-- **nonce**: único por (player, season_id); debe coincidir con el `nonce` usado en el circuito (mismo que en input.json).
-- **run_hash**: 32 bytes; puede ser los primeros 32 bytes del binding (p. ej. `pub_signals[0]` en hex = 32 bytes).
-- **season_id, score, wave**: mismos que en input.json (y que en pub_signals).
+- **player**: the player's address (auth).
+- **proof / vk / pub_signals**: the ones from `contract_proof.json` (in ScVal format; the client already uses proof/vk/pubSignals).
+- **nonce**: unique per (player, season_id); it must match the `nonce` used in the circuit (the same one as in input.json).
+- **run_hash**: 32 bytes; it can be the first 32 bytes of the binding (e.g. `pub_signals[0]` in hex = 32 bytes).
+- **season_id, score, wave**: the same as in input.json (and as in pub_signals).
 
-Ejemplo mínimo en JS (con `contract_proof.json` cargado). Convierte hex a `Buffer` para que el SDK construya los ScVals:
+Minimal JS example (with `contract_proof.json` loaded). Convert hex to `Buffer` so the SDK builds the ScVals:
 
 ```js
 import { submitZk } from './contracts/gameClient.js';
 
 const contractProof = await fetch('/circuits/build/contract_proof.json').then(r => r.json());
 
-// contract_proof.json usa hex; el cliente puede esperar proof/vk/pubSignals como ScVal o como objetos con Buffers
+// contract_proof.json uses hex; the client can expect proof/vk/pubSignals as ScVal or as objects with Buffers
 const toBuf = (hex) => Buffer.from(hex, 'hex');
 const zk = {
   proof: {
@@ -151,9 +151,9 @@ await submitZk(
 );
 ```
 
-Si tu `gameClient.submitZk` construye los ScVals internamente, pasa `zk` con la estructura que espere (p. ej. ya convertida a `xdr.ScVal` según el SDK).
+If your `gameClient.submitZk` builds the ScVals internally, pass `zk` with the structure it expects (e.g. already converted to `xdr.ScVal` according to the SDK).
 
-## 7. Simulación de recursos (Testnet)
+## 7. Resource simulation (Testnet)
 
 ```bash
 stellar contract invoke --sim-only \
@@ -172,20 +172,20 @@ stellar contract invoke --sim-only \
   --wave 5
 ```
 
-Revisar en la salida: CPU/memoria y eventos (p. ej. `zk_run_submitted`).
+Check the output for: CPU/memory and events (e.g. `zk_run_submitted`).
 
-## 8. Checklist validación end-to-end
+## 8. End-to-end validation checklist
 
-- [ ] **Circuito**: `circuits/GameRun.circom` compila con `build_circuit.sh` (r1cs, wasm, zkey, vkey.json).
-- [ ] **Proof real**: `input.json` + `generate_proof.js` → `contract_proof.json` sin error.
-- [ ] **Verifier**: `stellar contract invoke --sim-only` con proof/vk/pub_signals de `contract_proof.json` → éxito (resultado true o sin error de verificación).
-- [ ] **Policy**: `submit_zk` con mismo proof, nonce único, run_hash/season_id/score/wave coherentes → Ok(()); leaderboard y evento `zk_run_submitted` visibles.
-- [ ] **Anti-replay**: segunda llamada `submit_zk` con mismo (player, nonce, season_id) → falla (Replay).
-- [ ] **Frontend**: envío manual con proof real desde JS (submitZk + contract_proof.json) llega al verifier y la tx tiene éxito.
-- [ ] **Recursos**: simulación Testnet con proof real documentada (CPU/memoria) para el runbook.
+- [ ] **Circuit**: `circuits/GameRun.circom` compiles with `build_circuit.sh` (r1cs, wasm, zkey, vkey.json).
+- [ ] **Real proof**: `input.json` + `generate_proof.js` → `contract_proof.json` without errors.
+- [ ] **Verifier**: `stellar contract invoke --sim-only` with proof/vk/pub_signals from `contract_proof.json` → success (true result or no verification error).
+- [ ] **Policy**: `submit_zk` with the same proof, unique nonce, consistent run_hash/season_id/score/wave → Ok(()); leaderboard and `zk_run_submitted` event visible.
+- [ ] **Anti-replay**: second `submit_zk` call with the same (player, nonce, season_id) → fails (Replay).
+- [ ] **Frontend**: manual submission with a real proof from JS (submitZk + contract_proof.json) reaches the verifier and the tx succeeds.
+- [ ] **Resources**: Testnet simulation with a real proof documented (CPU/memory) for the runbook.
 
-## Notas
+## Notes
 
-- **run_hash**: En el circuito son dos campos (hi/lo); en el contrato es un solo `BytesN<32>`. Para binding, usar p. ej. los 32 bytes de la primera señal pública como run_hash on-chain.
-- **Byte order**: G1 y Fr: big-endian 32 bytes. G2: 128 bytes como **x0‖x1‖y0‖y1** (cada limb 32 bytes big-endian); Soroban BN254 no usa el orden x1‖x0‖y1‖y0 de Ethereum/snarkjs. El script `export_for_contract.js` ya exporta en el formato correcto.
-- **Powers of Tau**: En producción usar ceremonia multi-participante; el script usa un ptau pequeño para desarrollo/demo.
+- **run_hash**: in the circuit it's two fields (hi/lo); in the contract it's a single `BytesN<32>`. For binding, use e.g. the 32 bytes of the first public signal as the on-chain run_hash.
+- **Byte order**: G1 and Fr: big-endian 32 bytes. G2: 128 bytes as **x0‖x1‖y0‖y1** (each limb 32 bytes big-endian); Soroban BN254 does not use the Ethereum/snarkjs x1‖x0‖y1‖y0 order. The `export_for_contract.js` script already exports in the correct format.
+- **Powers of Tau**: in production use a multi-participant ceremony; the script uses a small ptau for development/demo.

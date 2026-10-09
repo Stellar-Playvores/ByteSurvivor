@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest';
  * requiring the Phaser engine.
  */
 
-// ── XP curve formula (mirrors main.js VIBE_CODER.xpForLevel) ──
+// ── XP curve formula (mirrors main.js BYTE_SURVIVOR.xpForLevel) ──
 const xpForLevel = (level) => Math.floor(100 * Math.pow(level, 1.5));
 
 // ── Player stat formulas (mirrors ArenaScene.getPlayerStats) ──

@@ -1,5 +1,5 @@
 /**
- * PostgreSQL connection pool for Cosmic Coder backend.
+ * PostgreSQL connection pool for ByteSurvivor backend.
  * Set DATABASE_URL in production (e.g. Render). If unset, auth will use in-memory fallback.
  */
 

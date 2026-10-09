@@ -3,7 +3,8 @@
  * Auto-saves at wave completion, allows continuing from last checkpoint
  */
 export default class SaveManager {
-  static SAVE_KEY = 'vibeCoderRunSave';
+  static SAVE_KEY = 'byteSurvivorRunSave';
+  static LEGACY_SAVE_KEY = 'vibeCoderRunSave';
 
   /**
    * Save current run state
@@ -47,7 +48,7 @@ export default class SaveManager {
    */
   static loadRun() {
     try {
-      const saved = localStorage.getItem(this.SAVE_KEY);
+      const saved = localStorage.getItem(this.SAVE_KEY) ?? localStorage.getItem(this.LEGACY_SAVE_KEY);
       if (!saved) return null;
 
       const data = JSON.parse(saved);
@@ -98,6 +99,7 @@ export default class SaveManager {
    */
   static clearSave() {
     localStorage.removeItem(this.SAVE_KEY);
+    localStorage.removeItem(this.LEGACY_SAVE_KEY);
   }
 
   /**
@@ -118,7 +120,7 @@ export default class SaveManager {
    * @returns {object|null}
    */
   static getSaveDataForWallet() {
-    const saved = localStorage.getItem(this.SAVE_KEY);
+    const saved = localStorage.getItem(this.SAVE_KEY) ?? localStorage.getItem(this.LEGACY_SAVE_KEY);
     if (!saved) return null;
     try {
       return JSON.parse(saved);
@@ -154,12 +156,12 @@ export default class SaveManager {
     scene.currentStage = save.stage;
 
     // Restore player stats
-    const vibeState = window.VIBE_CODER;
-    vibeState.level = save.player.level;
-    vibeState.xp = save.player.xp;
-    vibeState.totalXP = save.player.totalXP;
-    vibeState.kills = save.player.kills;
-    vibeState.streak = save.player.streak;
+    const survivorState = window.BYTE_SURVIVOR;
+    survivorState.level = save.player.level;
+    survivorState.xp = save.player.xp;
+    survivorState.totalXP = save.player.totalXP;
+    survivorState.kills = save.player.kills;
+    survivorState.streak = save.player.streak;
 
     // Restore player health
     scene.player.health = save.player.health;

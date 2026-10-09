@@ -15,7 +15,7 @@ npm run zk:proof
 echo ""
 echo "=== 3. Running contract tests (verifier + policy, incl. real proof) ==="
 cd contracts
-cargo test -p groth16_verifier -p cosmic_coder
+cargo test -p groth16_verifier -p bytesurvivor
 
 echo ""
 echo "=== E2E ZK: OK ==="

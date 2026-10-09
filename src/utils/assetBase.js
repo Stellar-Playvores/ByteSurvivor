@@ -13,14 +13,14 @@ export function getAssetBase() {
     } catch (_) {}
   }
 
-  // 2) Page is on a subpath (e.g. GitHub Pages /Cosmic-Coder-/) → use it
+  // 2) Page is on a subpath (e.g. GitHub Pages /ByteSurvivor/) → use it
   if (typeof window !== 'undefined' && window.location && window.location.pathname) {
     const path = window.location.pathname;
     const dir = path.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '/';
     if (dir !== '/' && dir !== '') return dir;
   }
 
-  // 3) Built bundle URL: /Cosmic-Coder-/assets/xxx.js → base = /Cosmic-Coder-
+  // 3) Built bundle URL: /ByteSurvivor/assets/xxx.js → base = /ByteSurvivor
   if (typeof import.meta !== 'undefined' && import.meta.url) {
     try {
       const u = new URL(import.meta.url);

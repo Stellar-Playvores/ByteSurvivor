@@ -1,4 +1,4 @@
-# SEP-10 Stellar Web Authentication (Cosmic Coder)
+# SEP-10 Stellar Web Authentication (ByteSurvivor)
 
 This project implements **SEP-10** (Stellar Web Authentication) for server-verified wallet login, aligned with:
 
@@ -19,7 +19,7 @@ To advertise SEP-10 so wallets can discover your endpoint, serve a `stellar.toml
 
 ```toml
 SIGNING_KEY = "<public key from SEP10_SERVER_SECRET_KEY>"
-WEB_AUTH_ENDPOINT = "https://cosmic-coder.onrender.com/auth"
+WEB_AUTH_ENDPOINT = "https://bytesurvivor.onrender.com/auth"
 ```
 
 `WEB_AUTH_ENDPOINT` must support:
@@ -45,7 +45,7 @@ Set these on the server (e.g. Render):
 |----------|-------------|
 | `SEP10_SERVER_SECRET_KEY` | Server Stellar secret key (S...) — **required** for signing challenges |
 | `JWT_SECRET` | Opaque secret for signing JWTs — **required** |
-| `SEP10_HOME_DOMAIN` | Home domain (e.g. `cosmiccoder.io`) |
+| `SEP10_HOME_DOMAIN` | Home domain (e.g. `bytesurvivor.io`) |
 | `SEP10_WEB_AUTH_DOMAIN` | Domain issuing the challenge (e.g. your Render URL) |
 | `SEP10_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015` or public network |
 | `SEP10_CHALLENGE_TIMEOUT` | Challenge validity in seconds (default 300) |
@@ -101,5 +101,5 @@ The backend returns 400 with a JSON body `{ error: "<message>" }`. Check that me
    - Use the same Stellar account (public key) for both challenge and sign.
 
 4. **SEP10_WEB_AUTH_DOMAIN mismatch**  
-   - On Render, set `SEP10_WEB_AUTH_DOMAIN=https://cosmic-coder.onrender.com` (your service’s public URL, no trailing slash).  
+   - On Render, set `SEP10_WEB_AUTH_DOMAIN=https://bytesurvivor.onrender.com` (your service’s public URL, no trailing slash).  
    - The challenge is built with this value; verification will fail if it doesn’t match the domain that serves the auth endpoints.

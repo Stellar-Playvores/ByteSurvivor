@@ -1,13 +1,13 @@
 /**
- * Prueba en consola: envía una entrada al leaderboard con nombre "CosmicCoder"
+ * Prueba en consola: envía una entrada al leaderboard con nombre "ByteSurvivor"
  * y verifica que GET /leaderboard la devuelva. Reintenta hasta que funcione.
  *
- * Uso: node scripts/test-leaderboard-cosmiccoder.js
+ * Uso: node scripts/test-leaderboard-bytesurvivor.js
  * (Asegúrate de tener el servidor corriendo: npm run server o similar)
  */
 
 const BASE = process.env.LEADERBOARD_URL || 'http://localhost:3333';
-const NAME = 'CosmicCoder';
+const NAME = 'ByteSurvivor';
 const TEST_ADDRESS = 'G' + 'A'.repeat(55);
 const MAX_ATTEMPTS = 15;
 const DELAY_MS = 2000;
@@ -37,14 +37,14 @@ async function getLeaderboard() {
   return { ok: res.ok, entries: Array.isArray(data.entries) ? data.entries : [] };
 }
 
-function foundCosmicCoder(entries) {
+function foundByteSurvivor(entries) {
   return entries.some(
     (e) => (e.name || '').trim().toLowerCase() === NAME.toLowerCase()
   );
 }
 
 async function run() {
-  console.log(`[CosmicCoder] Probando leaderboard en ${BASE} (nombre: "${NAME}")...\n`);
+  console.log(`[ByteSurvivor] Probando leaderboard en ${BASE} (nombre: "${NAME}")...\n`);
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       console.log(`Intento ${attempt}/${MAX_ATTEMPTS}: POST /leaderboard...`);
@@ -66,8 +66,8 @@ async function run() {
       }
       console.log('  Entradas recibidas:', get.entries.length);
 
-      if (foundCosmicCoder(get.entries)) {
-        console.log('\n[CosmicCoder] OK: La entrada con nombre "' + NAME + '" está en el ranking.');
+      if (foundByteSurvivor(get.entries)) {
+        console.log('\n[ByteSurvivor] OK: La entrada con nombre "' + NAME + '" está en el ranking.');
         console.log('Entradas:', JSON.stringify(get.entries, null, 2));
         process.exit(0);
       }
@@ -80,7 +80,7 @@ async function run() {
     }
     await sleep(DELAY_MS);
   }
-  console.log('\n[CosmicCoder] No se pudo verificar después de ' + MAX_ATTEMPTS + ' intentos.');
+  console.log('\n[ByteSurvivor] No se pudo verificar después de ' + MAX_ATTEMPTS + ' intentos.');
   process.exit(1);
 }
 

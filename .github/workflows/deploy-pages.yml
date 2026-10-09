@@ -1,4 +1,4 @@
-name: Deploy Cosmic Coder to GitHub Pages
+name: Deploy ByteSurvivor to GitHub Pages
 
 on:
   push:

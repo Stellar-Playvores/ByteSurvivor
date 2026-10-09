@@ -1,6 +1,6 @@
 /**
  * Weapon Unlock Client - Web3 integration for weapon unlock system
- * Interfaces with CosmicCoder contract for weapon unlocks and player stats
+ * Interfaces with ByteSurvivor contract for weapon unlocks and player stats
  */
 
 import { getContractId, getZkProverUrl } from './gameClient.js';
@@ -11,9 +11,9 @@ const TESTNET_RPC = 'https://soroban-testnet.stellar.org';
 const TESTNET_PASSPHRASE = 'Test SDF Network ; September 2015';
 
 /**
- * Get contract ID for CosmicCoder
+ * Get contract ID for ByteSurvivor
  */
-function getCosmicCoderContractId() {
+function getByteSurvivorContractId() {
   return getContractId();
 }
 
@@ -21,7 +21,7 @@ function getCosmicCoderContractId() {
  * Check if weapon unlock system is configured
  */
 export function isWeaponSystemConfigured() {
-  return !!getCosmicCoderContractId();
+  return !!getByteSurvivorContractId();
 }
 
 /**
@@ -30,9 +30,9 @@ export function isWeaponSystemConfigured() {
  * @returns {Promise<{gamesPlayed: number, bestScore: number, tier: number, canStartMatch: boolean}>}
  */
 export async function getPlayerStats(publicKey) {
-  const contractId = getCosmicCoderContractId();
+  const contractId = getByteSurvivorContractId();
   if (!contractId) {
-    throw new Error('CosmicCoder contract not configured');
+    throw new Error('ByteSurvivor contract not configured (VITE_BYTE_SURVIVOR_CONTRACT_ID)');
   }
 
   const stats = { gamesPlayed: 0, bestScore: 0, tier: 1, rank: 0, canStartMatch: false };
@@ -83,7 +83,7 @@ export async function getPlayerStats(publicKey) {
  * @returns {Promise<boolean>}
  */
 export async function isWeaponUnlocked(publicKey, weaponId) {
-  const contractId = getCosmicCoderContractId();
+  const contractId = getByteSurvivorContractId();
   if (!contractId) return false;
 
   try {
@@ -107,7 +107,7 @@ export async function isWeaponUnlocked(publicKey, weaponId) {
  * @returns {Promise<number[]>} Array of unlocked weapon IDs
  */
 export async function getUnlockedWeapons(publicKey) {
-  const contractId = getCosmicCoderContractId();
+  const contractId = getByteSurvivorContractId();
   if (!contractId) return [1]; // Only starter weapon
 
   try {
@@ -218,9 +218,9 @@ export async function generateUnlockProof(score, wallet, nonce, threshold) {
  * @returns {Promise<boolean>}
  */
 export async function unlockWeapon(publicKey, signTransaction, weaponId, proof) {
-  const contractId = getCosmicCoderContractId();
+  const contractId = getByteSurvivorContractId();
   if (!contractId) {
-    throw new Error('CosmicCoder contract not configured');
+    throw new Error('ByteSurvivor contract not configured (VITE_BYTE_SURVIVOR_CONTRACT_ID)');
   }
 
   const weapon = getWeaponById(weaponId);
@@ -319,7 +319,7 @@ async function buildQueryTx(publicKey, method, args) {
   const server = new rpc.Server(TESTNET_RPC);
   const source = await server.getAccount(publicKey);
   const account = new Account(publicKey, String(source.sequence ?? '0'));
-  const contract = new Contract(getCosmicCoderContractId());
+  const contract = new Contract(getByteSurvivorContractId());
   
   // Convert string args to proper ScVal (Address for public keys)
   const scArgs = args.map(arg => {

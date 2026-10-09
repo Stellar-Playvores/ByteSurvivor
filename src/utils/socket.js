@@ -63,13 +63,13 @@ export function connectToXPServer() {
         console.log(`📥 XP Event: ${data.type} +${data.amount} [${sourceName}]`);
 
         // Add XP through the game state
-        if (window.VIBE_CODER) {
+        if (window.BYTE_SURVIVOR) {
           // Pass source to addXP so isCodingActive() works for auto-move
           const source = {
             name: data.sourceName || 'CODE',
             color: data.sourceColor || '#ffffff'
           };
-          window.VIBE_CODER.addXP(data.amount, source);
+          window.BYTE_SURVIVOR.addXP(data.amount, source);
         }
       } catch (e) {
         console.error('Failed to parse XP event:', e);

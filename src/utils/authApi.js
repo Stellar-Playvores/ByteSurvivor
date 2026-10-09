@@ -1,14 +1,15 @@
 /**
- * Cosmic Coder SEP-10 auth API (client).
+ * ByteSurvivor SEP-10 auth API (client).
  * Flow: getChallenge(account) → user signs with Freighter → postToken(signedXdr) → store JWT.
  * All auth is server-verified; no simulated or client-only auth.
  * @see https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0010.md
  */
 
-const STORAGE_KEY = 'cosmicCoderJwt';
+const STORAGE_KEY = 'byteSurvivorJwt';
+const LEGACY_STORAGE_KEY = 'cosmicCoderJwt';
 
 /** Default backend when no env is set (e.g. build without .env). */
-const DEFAULT_API_BASE = 'https://cosmic-coder.onrender.com';
+const DEFAULT_API_BASE = 'https://bytesurvivor.onrender.com';
 
 /** API base URL: build-time env, then runtime config, then window override, then default. */
 function getApiBase() {
@@ -17,8 +18,8 @@ function getApiBase() {
   if (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_API_URL) {
     return String(window.__VITE_CONFIG__.VITE_API_URL).replace(/\/$/, '');
   }
-  if (typeof window !== 'undefined' && window.VIBE_CODER_API_URL) {
-    return String(window.VIBE_CODER_API_URL).replace(/\/$/, '');
+  if (typeof window !== 'undefined' && window.BYTE_SURVIVOR_API_URL) {
+    return String(window.BYTE_SURVIVOR_API_URL).replace(/\/$/, '');
   }
   return DEFAULT_API_BASE;
 }
@@ -32,7 +33,7 @@ let inMemoryToken = null;
 export function getStoredToken() {
   if (inMemoryToken) return inMemoryToken;
   try {
-    const t = localStorage.getItem(STORAGE_KEY);
+    const t = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     if (t) inMemoryToken = t;
     return t;
   } catch (_) {}
@@ -43,7 +44,10 @@ export function setStoredToken(token) {
   inMemoryToken = token;
   try {
     if (token) localStorage.setItem(STORAGE_KEY, token);
-    else localStorage.removeItem(STORAGE_KEY);
+    else {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
   } catch (_) {}
 }
 
@@ -51,6 +55,7 @@ export function clearStoredToken() {
   inMemoryToken = null;
   try {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch (_) {}
 }
 

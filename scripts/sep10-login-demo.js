@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------------
 // Configuración: URL base del backend que expone /auth/challenge y /auth/token
 // ---------------------------------------------------------------------------
-const API_BASE = 'https://cosmic-coder.onrender.com';
+const API_BASE = 'https://bytesurvivor.onrender.com';
 
 /**
  * Ejecuta el flujo completo de login SEP-10 y muestra el JWT en consola.

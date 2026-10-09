@@ -1,4 +1,4 @@
-// Cosmic Coder - ZK run attestation (BN254 / Groth16).
+// ByteSurvivor - ZK run attestation (BN254 / Groth16).
 // Binds: run_hash (hi/lo), score, wave, nonce, season_id, used_zk_weapon.
 // Enforces: score >= wave * MIN_SCORE_PER_WAVE (5).
 // used_zk_weapon: 0 = no ZK weapon used, 1 = ZK Plasma Rifle used.

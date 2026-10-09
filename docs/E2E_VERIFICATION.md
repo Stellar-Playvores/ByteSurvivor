@@ -1,36 +1,36 @@
-# E2E verification checklist (Hackathon demo)
+# E2E verification checklist
 
-Use this checklist before presenting to confirm the full flow works.
+Use this checklist to confirm the full flow works.
 
-## Demo para jueces (verificación visual)
+## Visual walkthrough
 
-**Flujo completo que deben ver los jueces:**
+**The end-to-end flow:**
 
-1. **Iniciar run** → Conectar Freighter → **Start Game** → firma `start_match()` → el contrato llama `start_game()` al Game Hub.
-2. **Jugar off-chain** → El jugador juega en el navegador hasta morir (health 0).
-3. **Al morir** → El cliente pide proof al prover → envía `submit_zk` al contrato → verifier valida proof on-chain → leaderboard actualizado.
-4. **Verificar on-chain** → En Stellar Expert (Policy o Game Hub), ver `submit_zk` / `end_game` y entradas en el leaderboard.
+1. **Start run** → Connect Freighter → **Start Game** → signs `start_match()` → the contract calls `start_game()` on the Game Hub.
+2. **Play off-chain** → The player plays in the browser until they die (health 0).
+3. **On death** → The client requests the proof from the prover → sends `submit_zk` to the contract → verifier validates the proof on-chain → leaderboard updated.
+4. **Verify on-chain** → On Stellar Expert (Policy or Game Hub), see `submit_zk` / `end_game` and the leaderboard entries.
 
-**Mensaje esperado al morir:** "Submitted to ZK leaderboard" o "Submitted to casual leaderboard".
+**Expected message on death:** "Submitted to ZK leaderboard" or "Submitted to casual leaderboard".
 
-**Circuito real:** El circuito Circom exige `score >= wave * 5` (MIN_SCORE_PER_WAVE = 5); una proof inválida (p. ej. score < wave*5) no verifica. Anti-replay: mismo (player, nonce, season_id) no puede usarse dos veces.
+**Real circuit:** the Circom circuit requires `score >= wave * 5` (MIN_SCORE_PER_WAVE = 5); an invalid proof (e.g. score < wave*5) doesn't verify. Anti-replay: the same (player, nonce, season_id) can't be used twice.
 
 ## Contract tests (automated)
 
-**Opción rápida (proof real + tests):**
+**Quick option (real proof + tests):**
 
 ```bash
 npm run zk:e2e
 ```
 
-Compila circuito, genera proof real (score=100, wave=5) y ejecuta los tests de verifier + policy (incl. `test_real_proof_verifier_and_submit_zk`).
+Compiles the circuit, generates a real proof (score=100, wave=5) and runs the verifier + policy tests (incl. `test_real_proof_verifier_and_submit_zk`).
 
-**O manualmente (desde repo root):**
+**Or manually (from repo root):**
 
 ```bash
 npm run zk:proof   # genera contract_proof.json
 cd contracts
-cargo test -p zk_verifier -p cosmic_coder
+cargo test -p zk_verifier -p bytesurvivor
 ```
 
 All tests should pass. These cover verifier behaviour, policy init, `submit_zk` (anti-replay, invalid proof, valid proof), and `submit_result`.
@@ -40,7 +40,7 @@ All tests should pass. These cover verifier behaviour, policy init, `submit_zk` 
 1. **Deploy and config**
    - [ ] Verifier and policy deployed on Stellar Testnet (see [DEPLOY_ZK_STEPS.md](DEPLOY_ZK_STEPS.md)). Current deployment: Policy `CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO`, Verifier `CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA`.
    - [ ] Policy initialized: `init(game_hub)`, `set_verifier(verifier_id)` (already done for the IDs above).
-   - [ ] Frontend: `.env` has `VITE_COSMIC_CODER_CONTRACT_ID=CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO` (or your POLICY_ID) and `VITE_ZK_PROVER_URL` (local or production prover).
+   - [ ] Frontend: `.env` has `VITE_BYTE_SURVIVOR_CONTRACT_ID=CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO` (or your POLICY_ID) and `VITE_ZK_PROVER_URL` (local or production prover).
 
 2. **Start game**
    - [ ] Connect wallet (Freighter) on title screen — **required to play**; the game requires a linked Freighter account.
@@ -62,6 +62,6 @@ All tests should pass. These cover verifier behaviour, policy init, `submit_zk` 
 
 ## Production (GitHub Pages)
 
-- [ ] Repo secrets set: `VITE_COSMIC_CODER_CONTRACT_ID`, `VITE_ZK_PROVER_URL` (public prover URL).
+- [ ] Repo secrets set: `VITE_BYTE_SURVIVOR_CONTRACT_ID`, `VITE_ZK_PROVER_URL` (public prover URL).
 - [ ] After push to `main`, the built game uses these and shows ZK Ranked when the prover is configured.
-- [ ] Judges can play at the deployed URL (they must connect Freighter to play), and see submissions on-chain.
+- [ ] Players can play at the deployed URL (they must connect Freighter to play) and see submissions on-chain.

@@ -38,7 +38,7 @@ let store = null;
 
 export function createSettingsStore() {
   store = new Store({
-    name: 'vibe-coder-settings',
+    name: 'bytesurvivor-settings',
     defaults
   });
 

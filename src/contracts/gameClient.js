@@ -1,5 +1,5 @@
 /**
- * Cosmic Coder - Soroban game contract client.
+ * ByteSurvivor - Soroban game contract client.
  * Calls start_match(), submit_result(wave, score), get_leaderboard(limit).
  * Requires Stellar Wallets Kit for signing.
  * @see https://github.com/jamesbachini/Stellar-Game-Studio
@@ -19,9 +19,9 @@ const TX_VALIDITY_SECONDS = 300;
 
 export function getContractId() {
   return (
-    (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_COSMIC_CODER_CONTRACT_ID) ||
-    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_COSMIC_CODER_CONTRACT_ID) ||
-    // Legacy fallback env var (removed — use VITE_COSMIC_CODER_CONTRACT_ID)
+    (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_BYTE_SURVIVOR_CONTRACT_ID) ||
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_BYTE_SURVIVOR_CONTRACT_ID) ||
+    // Legacy fallback env var (removed — use VITE_BYTE_SURVIVOR_CONTRACT_ID)
     ''
   );
 }
@@ -40,7 +40,7 @@ export function getZkProverUrl() {
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ZK_PROVER_URL) || '';
   if (runtimeUrl) return runtimeUrl;
   if (envUrl) return envUrl;
-  return 'https://cosmic-coder-zk-prover.onrender.com';
+  return 'https://bytesurvivor-zk-prover.onrender.com';
 }
 
 /**
@@ -92,7 +92,7 @@ async function invoke(contractId, method, args, publicKey, signTransaction) {
       if (net && net.networkPassphrase && net.networkPassphrase !== TESTNET_PASSPHRASE) {
         const name = (net.network || 'other').toUpperCase();
         throw new Error(
-          `[Cosmic Coder] Freighter is on "${name}". This app uses **Stellar Testnet**. ` +
+          `[ByteSurvivor] Freighter is on "${name}". This app uses **Stellar Testnet**. ` +
           'In Freighter, click the network name and switch to "Testnet", then try again.'
         );
       }
@@ -190,14 +190,14 @@ async function invoke(contractId, method, args, publicKey, signTransaction) {
       const isBadAuth = errSwitch?.name === 'txBadAuth' || String(safeJson(result)).includes('txBadAuth');
       const isBadSeq = errSwitch?.name === 'txBadSeq' || String(safeJson(result)).includes('txBadSeq');
       const authHint = isBadAuth
-        ? '\n\n[Cosmic Coder] txBadAuth: Make sure Freighter is set to **Stellar Testnet** (not Mainnet) and the connected account is the one signing.'
+        ? '\n\n[ByteSurvivor] txBadAuth: Make sure Freighter is set to **Stellar Testnet** (not Mainnet) and the connected account is the one signing.'
         : '';
       const seqHint = isBadSeq
-        ? '\n\n[Cosmic Coder] txBadSeq: Sequence number expired (e.g. another tx was sent). Please try submitting again.'
+        ? '\n\n[ByteSurvivor] txBadSeq: Sequence number expired (e.g. another tx was sent). Please try submitting again.'
         : '';
       if (isBadSeq && attempt === 0) {
         if (typeof console !== 'undefined' && console.warn) {
-          console.warn('[Cosmic Coder] txBadSeq on first attempt; retrying once with fresh sequence (you may need to sign again in Freighter).');
+          console.warn('[ByteSurvivor] txBadSeq on first attempt; retrying once with fresh sequence (you may need to sign again in Freighter).');
         }
         continue;
       }
@@ -223,7 +223,7 @@ async function playerScVal(signerPublicKey) {
  */
 export async function startMatch(signerPublicKey, signTransaction) {
   const contractId = getContractId();
-  if (!contractId) throw new Error('VITE_COSMIC_CODER_CONTRACT_ID not set');
+  if (!contractId) throw new Error('VITE_BYTE_SURVIVOR_CONTRACT_ID not set');
   return invoke(contractId, 'start_match', [await playerScVal(signerPublicKey)], signerPublicKey, signTransaction);
 }
 
@@ -232,7 +232,7 @@ export async function startMatch(signerPublicKey, signTransaction) {
  */
 export async function submitResult(signerPublicKey, signTransaction, wave, score) {
   const contractId = getContractId();
-  if (!contractId) throw new Error('VITE_COSMIC_CODER_CONTRACT_ID not set');
+  if (!contractId) throw new Error('VITE_BYTE_SURVIVOR_CONTRACT_ID not set');
   const { xdr, ScInt } = await import('@stellar/stellar-sdk');
   const args = [
     await playerScVal(signerPublicKey),
@@ -245,12 +245,12 @@ export async function submitResult(signerPublicKey, signTransaction, wave, score
 /**
  * Request ZK proof from backend (option B). Backend runs fullprove and returns contract_proof format.
  * V2: includes challenge_id, player_address, contract_id, domain_separator.
- * @param {string} [baseUrl] - Prover server URL (default VITE_ZK_PROVER_URL or https://cosmic-coder-zk-prover.onrender.com)
+ * @param {string} [baseUrl] - Prover server URL (default VITE_ZK_PROVER_URL or https://bytesurvivor-zk-prover.onrender.com)
  * @param {{ run_hash_hi: string, run_hash_lo: string, score: number, wave: number, nonce: number, season_id?: number, challenge_id?: number, player_address?: string, contract_id?: string, domain_separator?: string }} payload
  * @returns {Promise<{ proof: { a, b, c }, vk: object, pub_signals: string[] }>} hex strings
  */
 export async function requestZkProofV2(baseUrl, payload) {
-  // For submit_zk on Cosmic Coder contract we must use GameRun (7 pub signals), not GameRunV2.
+  // For submit_zk on ByteSurvivor contract we must use GameRun (7 pub signals), not GameRunV2.
   // Keep function name for compatibility with existing callers.
   const proverBase = baseUrl || getZkProverUrl();
   const url = String(proverBase).replace(/\/$/, '') + '/zk/prove';
@@ -582,7 +582,7 @@ export async function submitZkV2(
   seasonId
 ) {
   const contractId = getContractId();
-  if (!contractId) throw new Error('VITE_COSMIC_CODER_CONTRACT_ID not set');
+  if (!contractId) throw new Error('VITE_BYTE_SURVIVOR_CONTRACT_ID not set');
   if (!zk?.proof || !zk?.vk || !zk?.pubSignals) {
     throw new Error('submitZkV2 requires zk.proof, zk.vk, zk.pubSignals (BN254 Groth16)');
   }
@@ -755,7 +755,7 @@ export async function submitZkFromProverV2(signerPublicKey, signTransaction, pro
   const { proofBlob } = await noir.generateProof('GameRun', noirInputsFromPayload(payload));
   const { fullHex64 } = normalizeRunHashParts(payload);
   const contractId = getContractId();
-  if (!contractId) throw new Error('Cosmic Coder contract not configured');
+  if (!contractId) throw new Error('ByteSurvivor contract not configured (VITE_BYTE_SURVIVOR_CONTRACT_ID)');
   const { xdr, Address } = await import('@stellar/stellar-sdk');
 
   const args = [
@@ -857,7 +857,7 @@ export async function getLeaderboardBySeason(seasonId = 1, limit = 10) {
       .build();
     const sim = await server.simulateTransaction(built);
     if (sim.error) {
-      console.warn('[Cosmic Coder] get_leaderboard_by_season simulate error:', sim.error);
+      console.warn('[ByteSurvivor] get_leaderboard_by_season simulate error:', sim.error);
       return [];
     }
     const retval = sim.result?.retval;
@@ -887,7 +887,7 @@ export async function getLeaderboardBySeason(seasonId = 1, limit = 10) {
       }
       if (Array.isArray(native)) return [];
     } catch (nativeErr) {
-      console.warn('[Cosmic Coder] getLeaderboardBySeason decode:', nativeErr?.message || nativeErr);
+      console.warn('[ByteSurvivor] getLeaderboardBySeason decode:', nativeErr?.message || nativeErr);
     }
 
     // Fallback: manual XDR parsing (ScVal vec -> map entries)
@@ -936,7 +936,7 @@ export async function getLeaderboardBySeason(seasonId = 1, limit = 10) {
   } catch (e) {
     const msg = e?.message || String(e);
     if (msg && !/accountId is invalid|invalid.*contract/i.test(msg)) {
-      console.warn('[Cosmic Coder] getLeaderboardBySeason failed:', msg);
+      console.warn('[ByteSurvivor] getLeaderboardBySeason failed:', msg);
     }
     return [];
   }

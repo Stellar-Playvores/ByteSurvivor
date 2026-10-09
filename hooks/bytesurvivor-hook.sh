@@ -1,5 +1,5 @@
 #!/bin/bash
-# Vibe Coder XP Hook - sends events to the game server
+# ByteSurvivor XP Hook - sends events to the game server
 # This script is called by Claude Code hooks with event data on stdin
 
 # Read the event data from stdin
@@ -11,7 +11,7 @@ EVENT_TYPE="${CLAUDE_HOOK_EVENT:-unknown}"
 # Detect source - default to Claude since this hook is in Claude Code
 SOURCE="claude"
 
-# Send to the Vibe Coder server (silent, non-blocking)
+# Send to the ByteSurvivor server (silent, non-blocking)
 curl -s -X POST http://localhost:3333/event \
   -H "Content-Type: application/json" \
   -d "{\"type\": \"$EVENT_TYPE\", \"data\": $EVENT_DATA, \"source\": \"$SOURCE\"}" \

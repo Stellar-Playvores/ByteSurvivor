@@ -1,4 +1,4 @@
--- Cosmic Coder SEP-10 auth: users table
+-- ByteSurvivor SEP-10 auth: users table
 -- Run this once when setting up PostgreSQL (e.g. on Render).
 -- Stores public_key, username, and JWT when user signs the challenge.
 

@@ -7,7 +7,7 @@
  *   ZK_VERIFIER_CONTRACT_ID=<verifier_id> node scripts/zk/set_verifier_vk.js
  *   node scripts/zk/set_verifier_vk.js <verifier_id>
  *
- * Verifier ID is the contract you passed to Cosmic Coder init as --zk_verifier
+ * Verifier ID is the contract you passed to ByteSurvivor init as --zk_verifier
  * (e.g. CASQNBAV6ZX2DXVUIF2FHBAX3LFKTRNQ7PZ4IRPZOBXK2276KKZ3LV2Y).
  */
 import fs from 'fs';

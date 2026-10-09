@@ -1,5 +1,5 @@
 /**
- * ZK proof generation for Cosmic Coder ranked submit.
+ * ZK proof generation for ByteSurvivor ranked submit.
  * Writes input.json from request, runs generate_proof.js, returns contract_proof.json content.
  * Requires: circuits built (npm run zk:build), snarkjs, circom in PATH.
  */

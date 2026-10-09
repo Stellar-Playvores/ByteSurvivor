@@ -1,70 +1,70 @@
-# Desplegar el servidor ZK Prover (producción)
+# Deploying the ZK Prover server (production)
 
-Para que el juego online (GitHub Pages) pueda enviar partidas en modo **ranked (ZK)**, el frontend debe llamar a `POST /zk/prove` desde el navegador. Eso requiere un servidor accesible públicamente.
+For the online game (GitHub Pages) to submit runs in **ranked (ZK)** mode, the frontend must call `POST /zk/prove` from the browser. That requires a publicly reachable server.
 
-## Desplegar el prover en Render (recomendado)
+## Deploy the prover on Render (recommended)
 
-1. Entra en [render.com](https://render.com) e inicia sesión con GitHub.
-2. **New** → **Blueprint** → conecta el repo **Klorenn/Cosmic-Coder-** (o el que tengas).
-3. Render leerá `render.yaml`: se creará el servicio **cosmic-coder-zk-prover** con `Dockerfile.prover`. No cambies el nombre si quieres usar la URL que ya está en `config.json`.
-4. **Apply** y espera al primer deploy. La URL será `https://cosmic-coder-zk-prover.onrender.com`.
-5. En la app [https://klorenn.github.io/Cosmic-Coder-/](https://klorenn.github.io/Cosmic-Coder-/) ya está configurada esa URL en `public/config.json`; al cargar la página se usará para la prueba ZK al morir.
+1. Go to [render.com](https://render.com) and log in with GitHub.
+2. **New** → **Blueprint** → connect the **Stellar-Playvores/ByteSurvivor** repo (or whichever you have).
+3. Render will read `render.yaml`: it will create the **bytesurvivor-zk-prover** service with `Dockerfile.prover`. Don't change the name if you want to use the URL that's already in `config.json`.
+4. **Apply** and wait for the first deploy. The URL will be `https://bytesurvivor-zk-prover.onrender.com`.
+5. The app at [https://stellar-playvores.github.io/ByteSurvivor/](https://stellar-playvores.github.io/ByteSurvivor/) already has that URL configured in `public/config.json`; it will be used for the ZK proof when you die.
 
-**Nota:** En el plan gratuito de Render el servicio puede dormir tras inactividad; la primera petición ZK puede tardar unos segundos en responder.
+**Note:** on Render's free plan the service may sleep after inactivity; the first ZK request can take a few seconds to respond.
 
-## Si ves "Could not submit to chain" o "ZK prover unavailable"
+## If you see "Could not submit to chain" or "ZK prover unavailable"
 
-- **Prover no alcanzable:** La URL en `public/config.json` (`VITE_ZK_PROVER_URL`) debe apuntar a un servidor desplegado (Render, Railway, etc.). Si el prover no está desplegado o la URL es incorrecta, la prueba ZK no se hará y se enviará como CASUAL (o fallará si además falla el contrato).
-- **Para que la prueba ZK se realice:** Despliega el prover siguiendo esta guía, copia la URL pública y actualiza `public/config.json` con esa URL. Haz commit y push para que el deploy use la nueva config.
+- **Prover unreachable:** the URL in `public/config.json` (`VITE_ZK_PROVER_URL`) must point to a deployed server (Render, Railway, etc.). If the prover isn't deployed or the URL is wrong, the ZK proof won't be generated and the run is submitted as CASUAL (or it fails if the contract call fails too).
+- **To make the ZK proof run:** deploy the prover following this guide, copy the public URL and update `public/config.json` with that URL. Commit and push so the deploy uses the new config.
 
-## Opción 1: Docker (Railway, Fly.io, etc.)
+## Option 1: Docker (Railway, Fly.io, etc.)
 
-El repositorio incluye `Dockerfile.prover`. Requisito: la carpeta `circuits/build/` debe existir (con `GameRun_final.zkey`, `GameRun_js/`). Ya está en el repo.
+The repo includes `Dockerfile.prover`. Requirement: the `circuits/build/` folder must exist (with `GameRun_final.zkey`, `GameRun_js/`). It's already in the repo.
 
 ### Railway
 
-1. Conecta el repo en [railway.app](https://railway.app).
-2. New Project → Deploy from GitHub → selecciona el repo.
-3. Settings → Root Directory: deja vacío. Build: **Dockerfile** → Dockerfile path: `Dockerfile.prover`.
-4. Variables: no obligatorias. Puerto 3333 (Railway asigna PORT; el server usa `process.env.PORT || 3333`).
-5. Deploy. Usa la URL pública como `VITE_ZK_PROVER_URL` (ej. `https://xxx.up.railway.app`).
+1. Connect the repo at [railway.app](https://railway.app).
+2. New Project → Deploy from GitHub → select the repo.
+3. Settings → Root Directory: leave empty. Build: **Dockerfile** → Dockerfile path: `Dockerfile.prover`.
+4. Variables: none required. Port 3333 (Railway assigns `PORT`; the server uses `process.env.PORT || 3333`).
+5. Deploy. Use the public URL as `VITE_ZK_PROVER_URL` (e.g. `https://xxx.up.railway.app`).
 
-**Importante:** El server actual escucha en el puerto 3333. Railway inyecta `PORT`; hay que hacer que `server/index.js` use `process.env.PORT || 3333`.
+**Important:** the current server listens on port 3333. Railway injects `PORT`; `server/index.js` must use `process.env.PORT || 3333`.
 
 ### Render
 
 1. [render.com](https://render.com) → New → Web Service.
-2. Conecta el repo. Environment: **Docker**; Dockerfile path: `Dockerfile.prover`.
-3. Deploy. Usa la URL asignada como `VITE_ZK_PROVER_URL`.
+2. Connect the repo. Environment: **Docker**; Dockerfile path: `Dockerfile.prover`.
+3. Deploy. Use the assigned URL as `VITE_ZK_PROVER_URL`.
 
 ### Fly.io
 
 ```bash
-fly launch --dockerfile Dockerfile.prover --name cosmic-coder-zk-prover
+fly launch --dockerfile Dockerfile.prover --name bytesurvivor-zk-prover
 fly deploy
 ```
 
-Luego `fly info` para la URL.
+Then `fly info` for the URL.
 
-## Opción 2: Sin Docker (Railway / Render con Node)
+## Option 2: No Docker (Railway / Render with Node)
 
-Si usas "Native" en Railway/Render:
+If you use "Native" on Railway/Render:
 
 - Build command: `npm ci`
 - Start command: `node server/index.js`
-- Asegúrate de que `circuits/build/` esté en el repo (ya incluido).
-- En el host debe estar disponible `snarkjs` (añadir en package.json como dependencia o `npm install -g snarkjs` en el build).
+- Make sure `circuits/build/` is in the repo (already included).
+- `snarkjs` must be available on the host (add it in package.json as a dependency or `npm install -g snarkjs` during the build).
 
-## URLs de este proyecto
+## This project's URLs
 
-- **App (juego):** [https://klorenn.github.io/Cosmic-Coder-/](https://klorenn.github.io/Cosmic-Coder-/)
-- **Prover (Render):** Tras desplegar el Blueprint, la URL será algo como `https://cosmic-coder-zk-prover.onrender.com`. Esa URL ya está en `public/config.json` como `VITE_ZK_PROVER_URL`.
+- **App (game):** [https://stellar-playvores.github.io/ByteSurvivor/](https://stellar-playvores.github.io/ByteSurvivor/)
+- **Prover (Render):** after deploying the Blueprint, the URL will be something like `https://bytesurvivor-zk-prover.onrender.com`. That URL is already in `public/config.json` as `VITE_ZK_PROVER_URL`.
 
-## Configurar la URL del prover en el frontend
+## Configure the prover URL in the frontend
 
-- **App desplegada:** `public/config.json` ya tiene `VITE_ZK_PROVER_URL` apuntando al servicio de Render. Si usas otro nombre de servicio, actualiza esa URL en `config.json` y haz commit.
-- **Local:** Puedes usar `.env` con `VITE_ZK_PROVER_URL=...` o `public/config.json`.
+- **Deployed app:** `public/config.json` already has `VITE_ZK_PROVER_URL` pointing at the Render service. If you use a different service name, update that URL in `config.json` and commit.
+- **Local:** you can use `.env` with `VITE_ZK_PROVER_URL=...` or `public/config.json`.
 
 ## CORS
 
-El `server/index.js` ya envía `Access-Control-Allow-Origin: *` para peticiones al API. Si el frontend está en otro dominio (p. ej. GitHub Pages), las peticiones a `/zk/prove` deberían funcionar.
+`server/index.js` already sends `Access-Control-Allow-Origin: *` for API requests. If the frontend is on a different domain (e.g. GitHub Pages), requests to `/zk/prove` should work.

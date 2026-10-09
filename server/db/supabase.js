@@ -1,5 +1,5 @@
 /**
- * Supabase client para Cosmic Coder (tabla cosmic_coder_users).
+ * Supabase client para ByteSurvivor (tabla bytesurvivor_users).
  * Usa SUPABASE_URL + SUPABASE_ANON_KEY o SUPABASE_SERVICE_ROLE_KEY.
  */
 
@@ -19,4 +19,4 @@ export function getSupabase() {
   return client;
 }
 
-export const USERS_TABLE = 'cosmic_coder_users';
+export const USERS_TABLE = 'bytesurvivor_users';

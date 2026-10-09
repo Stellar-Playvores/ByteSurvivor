@@ -1,4 +1,4 @@
-# Cosmic Coder — Formal game, Stellar, and ZK guide
+# ByteSurvivor — Formal game, Stellar, and ZK guide
 
 **Version:** 0.8.x · Formal reference documentation (game + Stellar/Soroban + ZK ranked system).
 
@@ -6,9 +6,9 @@
 
 ## Part 1 — Game overview (off-chain runtime)
 
-### 1.1 What is Cosmic Coder
+### 1.1 What is ByteSurvivor
 
-**Cosmic Coder** is a browser-based survival game (Vampire-Survivors-like). You control one character in an arena, defeat enemies across successive waves, gain XP, and collect weapons/modifiers. Difficulty increases with the wave number. The game logic executes **off-chain** in the browser (Phaser). On-chain actions are only performed for session lifecycle and/or leaderboard submission.
+**ByteSurvivor** is a browser-based survival game (Vampire-Survivors-like). You control one character in an arena, defeat enemies across successive waves, gain XP, and collect weapons/modifiers. Difficulty increases with the wave number. The game logic executes **off-chain** in the browser (Phaser). On-chain actions are only performed for session lifecycle and/or leaderboard submission.
 
 - **Primary goal**: survive as many waves as possible and maximize total XP, which is the **score** used for ranking.
 - **Wallet requirements**:
@@ -65,7 +65,7 @@
 
 For ranked (ZK), all of the following must be true:
 - A Stellar wallet is connected and can sign.
-- A policy contract is configured (`VITE_COSMIC_CODER_CONTRACT_ID`).
+- A policy contract is configured (`VITE_BYTE_SURVIVOR_CONTRACT_ID`).
 - A prover service is reachable (`VITE_ZK_PROVER_URL` or trustless mode).
 - The run is a **new** run (not a continuation).
 
@@ -75,7 +75,7 @@ For ranked (ZK), all of the following must be true:
 
 ### 2.1 Identity and authentication (SEP-10)
 
-Cosmic Coder uses **Stellar SEP-10 Web Authentication** to establish a backend session associated with a Stellar public key (the wallet address). This provides:
+ByteSurvivor uses **Stellar SEP-10 Web Authentication** to establish a backend session associated with a Stellar public key (the wallet address). This provides:
 - a standard wallet signature challenge/response flow,
 - a server-issued session token,
 - a consistent identity for progress persistence and optional API features.
@@ -85,7 +85,7 @@ The in-game ranked path will prompt wallet signatures when needed and may attemp
 ### 2.2 Soroban contracts (ranked policy + verifier)
 
 The ranked system is implemented on Soroban as two main contracts:
-- **Policy contract (Cosmic Coder / Shadow Ascension)**: orchestrates ranked submission, replay protection, and leaderboard updates.
+- **Policy contract (ByteSurvivor / Shadow Ascension)**: orchestrates ranked submission, replay protection, and leaderboard updates.
 - **Verifier contract (zk_verifier, BN254)**: verifies the proof and public signals; it is intended to be stateless and free of game logic.
 
 The policy contract is the entry point for ranked runs and enforces anti-replay by tracking nonces per player and season.
@@ -114,11 +114,11 @@ In a game that runs in the browser, the server/contract cannot “see” your ru
 
 ### 3.2 Circuit and proof (Groth16, BN254)
 
-- **Circuit (Circom):** A program that defines a “statement”: given some **private inputs** and **public outputs**, the circuit checks relations between them. In Cosmic Coder, the circuit `GameRun.circom` exposes as **public outputs**:
+- **Circuit (Circom):** A program that defines a “statement”: given some **private inputs** and **public outputs**, the circuit checks relations between them. In ByteSurvivor, the circuit `GameRun.circom` exposes as **public outputs**:
   - `run_hash_hi`, `run_hash_lo` (run commitment),
   - `score`, `wave`, `nonce`, `season_id`.
 - **Proof (Groth16):** A short certificate (three group elements: a, b, c) that proves “I ran the circuit with these inputs and got these public outputs”. Anyone with the **verification key (VK)** can check on-chain that the proof matches those public signals **without** re-running the circuit.
-- **On-chain verification:** The **zk_verifier** contract receives (VK, proof, pub_signals), computes the linear combination `vk_x` from the public signals, and checks the pairing equation. If it holds, it returns “valid”; the policy contract (Cosmic Coder) then marks the nonce as used, updates the season leaderboard, and emits the event.
+- **On-chain verification:** The **zk_verifier** contract receives (VK, proof, pub_signals), computes the linear combination `vk_x` from the public signals, and checks the pairing equation. If it holds, it returns “valid”; the policy contract (ByteSurvivor) then marks the nonce as used, updates the season leaderboard, and emits the event.
 
 ---
 
@@ -163,14 +163,14 @@ The entire ranked flow is tied: same run_hash/score/wave/nonce/season in the pro
 
 - **Circuit:** 6 public outputs (run_hash hi/lo, score, wave, nonce, season_id). VK with `ic` of length 7.
 - **Proof:** Groth16 (a, b, c); verification with BN254 on Soroban.
-- **Contracts:** `zk_types` (shared types), `zk_verifier` (proof verification only), `cosmic_coder` (policy: replay, leaderboard, events, Hub).
+- **Contracts:** `zk_types` (shared types), `zk_verifier` (proof verification only), `bytesurvivor` (policy: replay, leaderboard, events, Hub).
 - **Detailed references:** `TECHNICAL_DOCUMENTATION.md`, `ZK_REAL_SETUP.md`, `DEPLOY_GITHUB_IO.md`, and `SEP10_AUTH.md`.
 
 ---
 
 ## Part 4 — Public on-chain verification (how anyone can audit ranked results)
 
-Cosmic Coder’s ranked mode is designed so that verification does not depend on trusting the client or a server. A third party can audit a ranked submission using only public chain data.
+ByteSurvivor’s ranked mode is designed so that verification does not depend on trusting the client or a server. A third party can audit a ranked submission using only public chain data.
 
 ### 4.1 What “verifiable on-chain” means here
 
@@ -188,7 +188,7 @@ For a ranked run to be considered valid, all of the following must be true on-ch
 Given a transaction hash (from the client logs or UI):
 
 1. Open the transaction in a Soroban explorer (e.g. Stellar Expert on testnet).
-2. Confirm the invocation target is the **policy contract** (Cosmic Coder).
+2. Confirm the invocation target is the **policy contract** (ByteSurvivor).
 3. Inspect nested invocations and confirm the **verifier contract** method was called.
 4. Confirm the transaction result is `SUCCESS`.
 5. Check emitted events for a ranked submission payload (player, season, score, wave, run hash).

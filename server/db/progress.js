@@ -1,12 +1,18 @@
 /**
  * Player progress persistence in Supabase.
- * Table: cosmic_coder_progress (address PK, high_score, high_wave, upgrades, legendaries, save_state, selected_character, updated_at)
+ * Table: bytesurvivor_progress (address PK, high_score, high_wave, upgrades, legendaries, save_state, selected_character, updated_at)
  */
 
 import { getSupabase } from './supabase.js';
 
-export const PROGRESS_TABLE = 'cosmic_coder_progress';
-const VALID_CHARS = ['vibecoder', 'destroyer', 'swordsman'];
+export const PROGRESS_TABLE = 'bytesurvivor_progress';
+const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
+const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
+
+function normalizeCharId(id) {
+  const resolved = LEGACY_CHARS[id] ?? id;
+  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+}
 
 /**
  * @param {string} address
@@ -28,7 +34,7 @@ export async function fetchProgress(address) {
       return null;
     }
     if (!data) return null;
-    const char = VALID_CHARS.includes(data.selected_character) ? data.selected_character : 'vibecoder';
+    const char = normalizeCharId(data.selected_character);
     return {
       upgrades: data.upgrades && typeof data.upgrades === 'object' ? data.upgrades : null,
       legendaries: data.legendaries && typeof data.legendaries === 'object' ? data.legendaries : null,
@@ -53,7 +59,7 @@ export async function saveProgress(address, data) {
   if (!supabase) return false;
   const addr = String(address || '').trim().slice(0, 56);
   if (!addr) return false;
-  const char = VALID_CHARS.includes(data.selectedCharacter) ? data.selectedCharacter : 'vibecoder';
+  const char = normalizeCharId(data.selectedCharacter);
   const payload = {
     address: addr,
     high_score: typeof data.highScore === 'number' ? Math.max(0, Math.floor(data.highScore)) : 0,

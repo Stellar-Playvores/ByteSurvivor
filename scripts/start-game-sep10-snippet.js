@@ -5,8 +5,8 @@
  * Requisitos: extensión Freighter instalada, backend con GET /auth y POST /auth.
  */
 
-const API_BASE = 'https://cosmic-coder.onrender.com'; // o tu backend
-const STORAGE_KEY = 'cosmicCoderJwt';
+const API_BASE = 'https://bytesurvivor.onrender.com'; // o tu backend
+const STORAGE_KEY = 'byteSurvivorJwt';
 const TESTNET_PASSPHRASE = 'Test SDF Network ; September 2015';
 
 /**

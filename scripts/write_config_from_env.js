@@ -15,7 +15,7 @@ const configPath = join(publicDir, 'config.json');
 const examplePath = join(publicDir, 'config.json.example');
 
 const CONFIG_KEYS = [
-  'VITE_COSMIC_CODER_CONTRACT_ID',
+  'VITE_BYTE_SURVIVOR_CONTRACT_ID',
   'VITE_GAME_HUB_CONTRACT_ID',
   'VITE_ZK_PROVER_URL',
   'VITE_PROGRESS_API_URL',

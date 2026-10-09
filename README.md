@@ -1,16 +1,16 @@
-# Cosmic Coder
+# ByteSurvivor
 
 **A vampire-survivors-style idle game where your coding activity powers your astronaut. Prove your runs on-chain with Stellar and zero-knowledge proofs.**
 
-**[Play Now](https://klorenn.github.io/Cosmic-Coder-/) · [Setup Guide](./SETUP.md) · [Changelog](./CHANGELOG.md)**
+**[Play Now](https://stellar-playvores.github.io/ByteSurvivor/) · [Setup Guide](./SETUP.md) · [Changelog](./CHANGELOG.md)**
 
 ---
 
 ## About the Game
 
-Cosmic Coder is an idle survival game set in a hostile digital universe. Your astronaut fights waves of enemies while you code; the game runs in the background and rewards real coding activity.
+ByteSurvivor is an idle survival game set in a hostile digital universe. Your astronaut fights waves of enemies while you code; the game runs in the background and rewards real coding activity.
 
-- **3 playable characters** — **VibeCoder** (balanced), **VoidNull** (raw power), **SyncStorm** (fast & agile). Each has unique sprites, idle, walk, and death animations.
+- **3 playable characters** — **ByteSurvivor** (balanced), **VoidNull** (raw power), **SyncStorm** (fast & agile). Each has unique sprites, idle, walk, and death animations.
 - **Auto-play AI** — HUNT, EVADE, and IDLE modes. Your character moves and attacks automatically.
 - **30+ weapons** — 11 evolved combos, melee and ranged. Weapons drop during runs and expire; evolution combines two weapons into a stronger one.
 - **Rebirth system** — Permanent prestige: spend BITS after each run on upgrades (damage, health, speed, etc.).
@@ -26,18 +26,18 @@ Gameplay is **100% off-chain** (Phaser 3). Only match start, match end, and lead
 
 | Character | Internal ID | Texture | Description |
 |-----------|-------------|---------|-------------|
-| **VibeCoder** | `vibecoder` | `player` | A former network architect whose consciousness merged with the terminal. Balanced stats. |
+| **ByteSurvivor** | `bytesurvivor` | `player` | A former network architect whose consciousness merged with the terminal. Balanced stats. |
 | **VoidNull** | `destroyer` | `player-destroyer` | The ultimate security protocol — erases existence. High damage. |
 | **SyncStorm** | `swordsman` | `player-swordsman` | An electrical storm of data — fast and agile. High speed. |
 
-Each character has dedicated death animation spritesheets (`VibeCoder/vibecoder-death.png`, `VoidNull/voidnull-death.png`, `SyncStorm/sync-death.png`). On game over, the death animation plays once and freezes on the last frame (character lying on the ground).
+Each character has dedicated death animation spritesheets (`ByteSurvivor/bytesurvivor-death.png`, `VoidNull/voidnull-death.png`, `SyncStorm/sync-death.png`). On game over, the death animation plays once and freezes on the last frame (character lying on the ground).
 
 ---
 
 ## Quick Start
 
 **Play in the browser (no install):**  
-**[https://klorenn.github.io/Cosmic-Coder-/](https://klorenn.github.io/Cosmic-Coder-/)**
+**[https://stellar-playvores.github.io/ByteSurvivor/](https://stellar-playvores.github.io/ByteSurvivor/)**
 
 On mobile, the game asks you to rotate to landscape. Connect your Freighter wallet on the title screen to play and submit to the leaderboard.
 
@@ -57,20 +57,20 @@ All assets (images, music, sprites) and config live **inside the repo** under `p
 - **Config:** `public/config.json` is loaded at runtime. In CI, `scripts/write_config_from_env.js` writes it from GitHub secrets before build so ZK prover URL, contract ID, and leaderboard API are set. If secrets are missing, the repo’s existing `config.json` or `config.json.example` is used.
 - **ZK:** Contract ID and prover URL come from `config.json`. Circuit artifacts (`public/circuits/`) are in the repo; the frontend only needs the verification key and config — no local paths.
 
-Set optional secrets in the repo: `VITE_COSMIC_CODER_CONTRACT_ID`, `VITE_ZK_PROVER_URL`, `VITE_LEADERBOARD_URL`, `VITE_API_URL`, etc. Then push to `main` or run the “Deploy to GitHub Pages” workflow manually.
+Set optional secrets in the repo: `VITE_BYTE_SURVIVOR_CONTRACT_ID`, `VITE_ZK_PROVER_URL`, `VITE_LEADERBOARD_URL`, `VITE_API_URL`, etc. Then push to `main` or run the “Deploy to GitHub Pages” workflow manually.
 
 ---
 
 ## How We Use Stellar and ZK
 
-Cosmic Coder uses **Stellar Testnet** and **Soroban** smart contracts to run a provably fair ranked leaderboard. We combine the [Stellar Game Studio](https://github.com/jamesbachini/Stellar-Game-Studio) **Game Hub** with our own **policy contract** and a **Groth16 ZK verifier** so that only cryptographically verified runs enter the ranked board.
+ByteSurvivor uses **Stellar Testnet** and **Soroban** smart contracts to run a provably fair ranked leaderboard. We combine the [Stellar Game Studio](https://github.com/jamesbachini/Stellar-Game-Studio) **Game Hub** with our own **policy contract** and a **Groth16 ZK verifier** so that only cryptographically verified runs enter the ranked board.
 
 ### Architecture
 
 1. **Game Hub (Stellar Game Studio)**  
    Central contract that tracks game sessions: `start_game()` and `end_game()`. Our policy contract calls it when a player starts or finishes a run.
 
-2. **Policy contract (cosmic_coder)**  
+2. **Policy contract (bytesurvivor)**  
    Our game logic on-chain:
    - `start_match(player)` — Called when you press "Start Game"; it calls the Game Hub's `start_game()`.
    - `submit_result(player, wave, score)` — Casual submission: checks `score >= wave * MIN_SCORE_PER_WAVE` (MIN = 5), then calls `end_game()` and updates the leaderboard.
@@ -100,8 +100,8 @@ So: **Stellar** provides the chain and the Game Hub session lifecycle; **ZK** en
 
 | URL | Purpose | Config key |
 |-----|---------|------------|
-| **https://cosmic-coder.onrender.com** | API: leaderboard, auth, progress. Used by the frontend for ranking and login. | `VITE_API_URL` / `VITE_LEADERBOARD_URL` |
-| **https://cosmic-coder-zk-prover.onrender.com** | ZK prover: generates Groth16 proofs from run data. Frontend sends score/wave/nonce and gets back a proof, then submits it to the contract with Freighter. | `VITE_ZK_PROVER_URL` |
+| **https://bytesurvivor.onrender.com** | API: leaderboard, auth, progress. Used by the frontend for ranking and login. | `VITE_API_URL` / `VITE_LEADERBOARD_URL` |
+| **https://bytesurvivor-zk-prover.onrender.com** | ZK prover: generates Groth16 proofs from run data. Frontend sends score/wave/nonce and gets back a proof, then submits it to the contract with Freighter. | `VITE_ZK_PROVER_URL` |
 
 **Important:** `start_match` and all contract calls (start_match, submit_zk, submit_result) are **signed by the user in Freighter** and sent **directly to Stellar Testnet RPC**. They do **not** go through these URLs. If you get **txBadAuth**, the contract is rejecting the signature — set Freighter to **Stellar Testnet** (not Mainnet) and use the same account that is connected.
 
@@ -110,10 +110,10 @@ So: **Stellar** provides the chain and the Game Hub session lifecycle; **ZK** en
 | Contract | Role | Stellar Expert |
 |----------|------|----------------|
 | **Game Hub** | Session lifecycle: `start_game`, `end_game` | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG) |
-| **Policy (Cosmic Coder)** | Our game: `start_match`, `submit_result`, `submit_zk`, leaderboard | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO) |
+| **Policy (ByteSurvivor)** | Our game: `start_match`, `submit_result`, `submit_zk`, leaderboard | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO) |
 | **Verifier (zk_verifier)** | BN254 Groth16 proof verification | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA) |
 
-- **Play:** [Cosmic Coder](https://klorenn.github.io/Cosmic-Coder-/)
+- **Play:** [ByteSurvivor](https://stellar-playvores.github.io/ByteSurvivor/)
 - **Deploy contracts & prover:** [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md)
 
 ### ZK details
@@ -132,12 +132,12 @@ So: **Stellar** provides the chain and the Game Hub session lifecycle; **ZK** en
 3. Play until you die. On death, the game automatically submits your run via ZK proof (if prover is configured) or casual fallback.
 4. **Verify:** On Stellar Expert, open the [Policy contract](https://stellar.expert/explorer/testnet/contract/CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO) and check recent invocations for `start_match`, `submit_zk`, or `submit_result` and the resulting `end_game` calls on the Game Hub.
 
-**Local setup for full ZK flow:** Set `VITE_COSMIC_CODER_CONTRACT_ID` and `VITE_ZK_PROVER_URL` (e.g. to your prover backend), run the prover, then connect wallet and play. See [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md) and [docs/HACKATHON_DO_THIS.md](docs/HACKATHON_DO_THIS.md).
+**Local setup for full ZK flow:** Set `VITE_BYTE_SURVIVOR_CONTRACT_ID` and `VITE_ZK_PROVER_URL` (e.g. to your prover backend), run the prover, then connect wallet and play. See [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md) and [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md).
 
 ## Project Structure
 
 ```
-cosmic-coder/
+bytesurvivor/
 ├── src/
 │   ├── main.js              # Phaser config, characters, upgrades, legendaries
 │   ├── locales/             # en.js, es.js (i18n)
@@ -149,13 +149,13 @@ cosmic-coder/
 ├── contracts/
 │   ├── zk_types/            # Shared ZK types
 │   ├── groth16_verifier/    # BN254 Groth16 verifier (Soroban)
-│   └── cosmic_coder/        # Game policy contract (Cosmic Coder, Game Hub + leaderboard)
+│   └── bytesurvivor/        # Game policy contract (ByteSurvivor, Game Hub + leaderboard)
 ├── circuits/                # Circom circuit (GameRun)
 ├── server/                  # XP server + ZK prover (/zk/prove)
 ├── hooks/                   # IDE/AI hooks for XP
 ├── public/
 │   └── assets/sprites/player/
-│       ├── VibeCoder/       # vibecoder-death.png (5 frames, 640×128)
+│       ├── ByteSurvivor/    # bytesurvivor-death.png (5 frames, 640×128)
 │       ├── VoidNull/        # voidnull-death.png (4 frames, 512×128)
 │       └── SyncStorm/       # sync-death.png (4 frames, 512×128)
 └── index.html
@@ -175,9 +175,9 @@ cosmic-coder/
 
 ## Deploy
 
-The game deploys to **GitHub Pages** on push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (build with `npm run build`). Enable GitHub Pages in the repo settings (Source: GitHub Actions). The live URL is **https://klorenn.github.io/Cosmic-Coder-/**.
+The game deploys to **GitHub Pages** on push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (build with `npm run build`). Enable GitHub Pages in the repo settings (Source: GitHub Actions). The live URL is **https://stellar-playvores.github.io/ByteSurvivor/**.
 
-For contract and prover deployment (Testnet + Render or similar), see [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md) and [docs/HACKATHON_DO_THIS.md](docs/HACKATHON_DO_THIS.md).
+For contract and prover deployment (Testnet + Render or similar), see [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md) and [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md).
 
 ---
 

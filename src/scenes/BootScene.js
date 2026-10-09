@@ -72,7 +72,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.spritesheet('robot-walk', asset('assets/sprites/player/robot-walk.png'), { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('robot-hurt', asset('assets/sprites/player/robot-hurt.png'), { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('robot-death', asset('assets/sprites/player/robot-death.png'), { frameWidth: 128, frameHeight: 128 });
-    this.load.spritesheet('vibecoder-death', asset('assets/sprites/player/VibeCoder/vibecoder-death.png'), { frameWidth: 128, frameHeight: 128 });
+    this.load.spritesheet('bytesurvivor-death', asset('assets/sprites/player/ByteSurvivor/bytesurvivor-death.png'), { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('destroyer-death', asset('assets/sprites/player/VoidNull/Dead.png'), { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('swordsman-death', asset('assets/sprites/player/SyncStorm/sync-death.png'), { frameWidth: 128, frameHeight: 128 });
     this.load.spritesheet('robot-enabling', asset('assets/sprites/player/robot-enabling.png'), { frameWidth: 128, frameHeight: 128 });
@@ -125,7 +125,7 @@ export default class BootScene extends Phaser.Scene {
       }
     };
 
-    // Build player textures for all 3 characters (VibeCoder, Destroyer, Swordsman)
+    // Build player textures for all 3 characters (ByteSurvivor, Destroyer, Swordsman)
     safeStep('buildRobotPlayerTexture', () => this.buildRobotPlayerTexture());
     safeStep('buildCharacterTexture(destroyer)', () => this.buildCharacterTexture('destroyer'));
     safeStep('buildCharacterTexture(swordsman)', () => this.buildCharacterTexture('swordsman'));
@@ -216,19 +216,19 @@ export default class BootScene extends Phaser.Scene {
   }
 
   registerAnimations() {
-    // VibeCoder (default) - player
+    // ByteSurvivor (default) - player
     if (this.textures.exists('player') && this.textures.exists('robot-hurt')) {
       this.registerCharacterAnimations('player', 'robot-hurt');
     } else {
       console.warn('[BootScene] Skipping player animations — texture "player" or "robot-hurt" missing');
     }
   
-    // VibeCoder death animation (game over): 5 frames (640×128), frameRate 4, play once
-    if (this.textures.exists('vibecoder-death')) {
-      const end = Math.max(0, (this.textures.get('vibecoder-death')?.frameTotal || 1) - 2);
+    // ByteSurvivor death animation (game over): 5 frames (640×128), frameRate 4, play once
+    if (this.textures.exists('bytesurvivor-death')) {
+      const end = Math.max(0, (this.textures.get('bytesurvivor-death')?.frameTotal || 1) - 2);
       this.anims.create({
-        key: 'vibecoder-death',
-        frames: this.anims.generateFrameNumbers('vibecoder-death', { start: 0, end }),
+        key: 'bytesurvivor-death',
+        frames: this.anims.generateFrameNumbers('bytesurvivor-death', { start: 0, end }),
         frameRate: 4,
         repeat: 0
       });
@@ -245,7 +245,7 @@ export default class BootScene extends Phaser.Scene {
       });
     }
   
-    // VibeCoder enabling animation (for character selection)
+    // ByteSurvivor enabling animation (for character selection)
     if (this.textures.exists('robot-enabling')) {
       this.anims.create({
         key: 'robot-enabling',
@@ -473,7 +473,7 @@ export default class BootScene extends Phaser.Scene {
   }
 
   /**
-   * Build main player texture from CraftPix robot sprites (VibeCoder).
+   * Build main player texture from CraftPix robot sprites (ByteSurvivor).
    * Combines Idle (6 frames) + Walk (6 frames) into one 'player' sheet (12 frames, 128x128 each).
    */
   buildRobotPlayerTexture() {

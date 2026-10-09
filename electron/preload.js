@@ -38,5 +38,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 // Let the game know it's running in Electron
 window.addEventListener('DOMContentLoaded', () => {
-  console.log('[Cosmic Coder] Running in Electron with built-in XP server');
+  console.log('[ByteSurvivor] Running in Electron with built-in XP server');
 });

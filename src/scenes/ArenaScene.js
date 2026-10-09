@@ -23,11 +23,15 @@ import { validateGameRules, computeGameHash, generateRunSeed } from '../zk/gameP
 import * as BALANCE from '../config/balance.js';
 
 /** localStorage key: set to '1' once user has signed a ZK proof at least once. Weapon drops only allowed after that. */
-const STORAGE_HAS_SIGNED_ZK_ONCE = 'cosmicCoderHasSignedZkOnce';
+const STORAGE_HAS_SIGNED_ZK_ONCE = 'byteSurvivorHasSignedZkOnce';
+const LEGACY_STORAGE_HAS_SIGNED_ZK_ONCE = 'cosmicCoderHasSignedZkOnce';
+const STORAGE_RANKED_HISTORY = 'byteSurvivorRankedHistory';
+const LEGACY_STORAGE_RANKED_HISTORY = 'cosmicCoderRankedHistory';
 
 function hasSignedZkOnce() {
   try {
-    return localStorage.getItem(STORAGE_HAS_SIGNED_ZK_ONCE) === '1';
+    return (localStorage.getItem(STORAGE_HAS_SIGNED_ZK_ONCE)
+      ?? localStorage.getItem(LEGACY_STORAGE_HAS_SIGNED_ZK_ONCE)) === '1';
   } catch (_) {
     return false;
   }
@@ -424,7 +428,8 @@ export default class ArenaScene extends Phaser.Scene {
         // always treat as returning even if on-chain queries fail.
         let localRankedHistory = false;
         try {
-          const raw = localStorage.getItem('cosmicCoderRankedHistory');
+          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY)
+            ?? localStorage.getItem(LEGACY_STORAGE_RANKED_HISTORY);
           const map = raw ? JSON.parse(raw) : {};
           localRankedHistory = !!map?.[addr];
         } catch (_) {}
@@ -571,7 +576,7 @@ export default class ArenaScene extends Phaser.Scene {
       }
     });
 
-    console.log('[Cosmic Coder] Game start:', this.isContinuedGame ? 'continued' : 'new', 'mode:', this.gameMode === 'zk_ranked' ? 'ZK Ranked' : 'Casual');
+    console.log('[ByteSurvivor] Game start:', this.isContinuedGame ? 'continued' : 'new', 'mode:', this.gameMode === 'zk_ranked' ? 'ZK Ranked' : 'Casual');
     if (typeof this.zkProofSubmitted === 'undefined') this.zkProofSubmitted = false;
 
     // ZK Configuration Check
@@ -579,7 +584,7 @@ export default class ArenaScene extends Phaser.Scene {
       console.log('[ZK Config] Checking configuration...');
       const contractId = gameClient.getContractId();
       console.log('[ZK Config] Contract ID from gameClient:', contractId);
-      console.log('[ZK Config] Contract ID from config.json:', window.__VITE_CONFIG__?.VITE_COSMIC_CODER_CONTRACT_ID);
+      console.log('[ZK Config] Contract ID from config.json:', window.__VITE_CONFIG__?.VITE_BYTE_SURVIVOR_CONTRACT_ID);
       console.log('[ZK Config] Contract ID length:', contractId?.length);
       console.log('[ZK Config] Contract ID starts with C:', contractId?.startsWith('C'));
       console.log('[ZK Config] Prover URL:', gameClient.getZkProverUrl());
@@ -608,7 +613,7 @@ export default class ArenaScene extends Phaser.Scene {
 
     // Gameplay music mode — cambiar música del menú a gameplay al entrar
     Audio.setMusicMode('gameplay');
-    if (window.VIBE_SETTINGS?.musicEnabled) {
+    if (window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) {
       Audio.startGameplayMusic();
     }
 
@@ -664,7 +669,7 @@ export default class ArenaScene extends Phaser.Scene {
 
     // Secret creator key - Press G to unlock Hunter's Warglaive
     this.input.keyboard.on('keydown-G', () => {
-      const legendaries = window.VIBE_LEGENDARIES;
+      const legendaries = window.BYTE_SURVIVOR_LEGENDARIES;
       if (legendaries && !legendaries.hasUnlocked('huntersWarglaive')) {
         legendaries.forceUnlock('huntersWarglaive');
         legendaries.equip('huntersWarglaive');
@@ -782,7 +787,7 @@ export default class ArenaScene extends Phaser.Scene {
       this.lastInputTime = this.time.now;
       Audio.initAudio();
       Audio.resumeAudio();
-      if (window.VIBE_SETTINGS?.musicEnabled && !Audio.isGameplayMusicPlaying()) {
+      if (window.BYTE_SURVIVOR_SETTINGS?.musicEnabled && !Audio.isGameplayMusicPlaying()) {
         Audio.startGameplayMusic();
       }
     };
@@ -1053,8 +1058,8 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   createPlayer() {
-    // Use selected character (VibeCoder, VoidNull/destroyer, SyncStorm/swordsman) — store for game over so death anim matches
-    const charId = progressStore.selectedCharacter || window.VIBE_SELECTED_CHARACTER || 'vibecoder';
+    // Use selected character (ByteSurvivor, VoidNull/destroyer, SyncStorm/swordsman) — store for game over so death anim matches
+    const charId = progressStore.selectedCharacter || window.BYTE_SURVIVOR_SELECTED_CHARACTER || 'bytesurvivor';
     this.playingCharacterId = charId;
     // Store death keys now so game over always uses this character's animation (no fallback drift)
     if (charId === 'destroyer') {
@@ -1064,10 +1069,10 @@ export default class ArenaScene extends Phaser.Scene {
       this.gameOverDeathSpriteKey = 'swordsman-death';
       this.gameOverDeathAnimKey = 'swordsman-death';
     } else {
-      this.gameOverDeathSpriteKey = 'vibecoder-death';
-      this.gameOverDeathAnimKey = 'vibecoder-death';
+      this.gameOverDeathSpriteKey = 'bytesurvivor-death';
+      this.gameOverDeathAnimKey = 'bytesurvivor-death';
     }
-    const char = window.VIBE_CHARACTERS?.[charId] || window.VIBE_CHARACTERS.vibecoder;
+    const char = window.BYTE_SURVIVOR_CHARACTERS?.[charId] || window.BYTE_SURVIVOR_CHARACTERS.bytesurvivor;
     this.playerAnimPrefix = char.animPrefix;
 
     // Create player at center of the larger world
@@ -1200,7 +1205,7 @@ export default class ArenaScene extends Phaser.Scene {
       this.barkBubble.destroy();
       this.barkBubble = null;
     }
-    const charId = this.playingCharacterId || progressStore?.selectedCharacter || 'vibecoder';
+    const charId = this.playingCharacterId || progressStore?.selectedCharacter || 'bytesurvivor';
     const phrases = getBarks(charId);
     if (!phrases.length) return;
     const phrase = Phaser.Utils.Array.GetRandom(phrases);
@@ -1261,10 +1266,10 @@ export default class ArenaScene extends Phaser.Scene {
 
   getStats() {
     // Stats scale with level - more aggressive scaling
-    const level = window.VIBE_CODER.level;
+    const level = window.BYTE_SURVIVOR.level;
 
     // Apply upgrade bonuses
-    const upgrades = window.VIBE_UPGRADES || { getBonus: () => 1 };
+    const upgrades = window.BYTE_SURVIVOR_UPGRADES || { getBonus: () => 1 };
     const damageBonus = upgrades.getBonus('damage');
     const healthBonus = upgrades.getBonus('health');
     const speedBonus = upgrades.getBonus('speed');
@@ -1294,7 +1299,7 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   getCritChance() {
-    const upgrades = window.VIBE_UPGRADES || { getBonus: () => 1 };
+    const upgrades = window.BYTE_SURVIVOR_UPGRADES || { getBonus: () => 1 };
     const critBonus = (upgrades.getBonus('critChance') - 1); // convert 1.x to 0.x
     return 0.1 + critBonus; // base 10% + upgrade bonus
   }
@@ -1331,7 +1336,7 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   getWeaponDurationBonus() {
-    const upgrades = window.VIBE_UPGRADES || { getBonus: () => 1 };
+    const upgrades = window.BYTE_SURVIVOR_UPGRADES || { getBonus: () => 1 };
     return upgrades.getBonus('weaponDuration');
   }
 
@@ -1686,7 +1691,7 @@ export default class ArenaScene extends Phaser.Scene {
    * - Eventos importantes: this.showEventPopUp(t('game.wave_cleared'), 'Wave 5', 1500).
    */
   updateHUD() {
-    const state = window.VIBE_CODER;
+    const state = window.BYTE_SURVIVOR;
     const L = this.hudLayout || getHudLayout(this);
     const xpNeeded = state.xpForLevel(state.level);
     const xpPercent = state.xp / xpNeeded;
@@ -1779,7 +1784,7 @@ export default class ArenaScene extends Phaser.Scene {
     Audio.playXPGain();
 
     // Check for CLI source info (from live XP server)
-    const source = window.VIBE_CODER?.lastXPSource;
+    const source = window.BYTE_SURVIVOR?.lastXPSource;
     const hasSource = source && source.name && source.name !== 'CODE';
 
     // Format text with optional source tag
@@ -1801,8 +1806,8 @@ export default class ArenaScene extends Phaser.Scene {
     ).setOrigin(0.5);
 
     // Clear the source after displaying
-    if (window.VIBE_CODER?.lastXPSource) {
-      window.VIBE_CODER.lastXPSource = null;
+    if (window.BYTE_SURVIVOR?.lastXPSource) {
+      window.BYTE_SURVIVOR.lastXPSource = null;
     }
 
     // Animate popup
@@ -2013,17 +2018,17 @@ export default class ArenaScene extends Phaser.Scene {
       // Wave complete bonus XP (more for boss waves)
       const wassBossWave = (this.waveNumber - 1) % 20 === 0;
       const waveXpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-      window.VIBE_CODER.addXP(Math.floor(this.waveNumber * (wassBossWave ? 100 : 25) * waveXpMult));
+      window.BYTE_SURVIVOR.addXP(Math.floor(this.waveNumber * (wassBossWave ? 100 : 25) * waveXpMult));
 
       // Auto-save at wave completion
       this.autoSaveRun();
 
       // Save progress to leaderboard (so wave 13 etc. shows even if player hasn't died yet)
-      const state = window.VIBE_CODER;
-      const settings = window.VIBE_SETTINGS || {};
+      const state = window.BYTE_SURVIVOR;
+      const settings = window.BYTE_SURVIVOR_SETTINGS || {};
       const nameForLeaderboard = (settings.playerName && String(settings.playerName).trim()) || (() => {
-        const cid = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.VIBE_SELECTED_CHARACTER ?? 'vibecoder';
-        const ch = window.VIBE_CHARACTERS?.[cid];
+        const cid = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.BYTE_SURVIVOR_SELECTED_CHARACTER ?? 'bytesurvivor';
+        const ch = window.BYTE_SURVIVOR_CHARACTERS?.[cid];
         return ch ? (ch.displayName_en || ch.displayName || ch.name || '') : '';
       })() || 'Anonymous';
       stellarWallet.getAddress().then((addr) => {
@@ -2078,7 +2083,7 @@ export default class ArenaScene extends Phaser.Scene {
 
     const bossData = this.bossTypes[bossKey];
 
-    const playerLevel = Math.max(1, window.VIBE_CODER.level || 1);
+    const playerLevel = Math.max(1, window.BYTE_SURVIVOR.level || 1);
     const levelHealthMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_HEALTH_FACTOR ?? 0.1), BALANCE.LEVEL_HEALTH_CAP ?? 6);
     const levelSpeedMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_SPEED_FACTOR ?? 0.03), BALANCE.LEVEL_SPEED_CAP ?? 2.2);
     const levelDamageMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_DAMAGE_FACTOR ?? 0.06), BALANCE.LEVEL_DAMAGE_CAP ?? 4);
@@ -2174,7 +2179,7 @@ export default class ArenaScene extends Phaser.Scene {
     y = Phaser.Math.Clamp(y, 50, this.worldHeight - 50);
 
     // Choose enemy type based on wave with scaling pools
-    const playerLevel = Math.max(1, window.VIBE_CODER.level || 1);
+    const playerLevel = Math.max(1, window.BYTE_SURVIVOR.level || 1);
     // Scale with player level so higher level = harder enemies (still killable, but reaching wave 100 is tough)
     const levelHealthMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_HEALTH_FACTOR ?? 0.1), BALANCE.LEVEL_HEALTH_CAP ?? 6);
     const levelSpeedMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_SPEED_FACTOR ?? 0.03), BALANCE.LEVEL_SPEED_CAP ?? 2.2);
@@ -2359,7 +2364,7 @@ export default class ArenaScene extends Phaser.Scene {
   spawnMiniBoss() {
     const miniBossData = this.miniBossTypes['miniboss-deadlock'];
 
-    const playerLevel = Math.max(1, window.VIBE_CODER.level || 1);
+    const playerLevel = Math.max(1, window.BYTE_SURVIVOR.level || 1);
     const levelHealthMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_HEALTH_FACTOR ?? 0.1), BALANCE.LEVEL_HEALTH_CAP ?? 6);
     const levelSpeedMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_SPEED_FACTOR ?? 0.03), BALANCE.LEVEL_SPEED_CAP ?? 2.2);
     const levelDamageMult = Math.min(1 + playerLevel * (BALANCE.LEVEL_DAMAGE_FACTOR ?? 0.06), BALANCE.LEVEL_DAMAGE_CAP ?? 4);
@@ -2591,8 +2596,8 @@ export default class ArenaScene extends Phaser.Scene {
         // Check death
         if (enemy.health <= 0) {
           const xpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-          window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * xpMult));
-          window.VIBE_CODER.kills++;
+          window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * xpMult));
+          window.BYTE_SURVIVOR.kills++;
           if (Math.random() < 0.1) this.spawnWeaponDrop(enemy.x, enemy.y);
           this.tryBarkOnKill();
           enemy.destroy();
@@ -2677,7 +2682,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.pauseMenu.add(pauseTitle);
 
     // Wave info
-    const waveInfo = this.add.text(0, -90, `WAVE ${this.waveNumber} // KILLS: ${window.VIBE_CODER.kills}`, {
+    const waveInfo = this.add.text(0, -90, `WAVE ${this.waveNumber} // KILLS: ${window.BYTE_SURVIVOR.kills}`, {
       fontFamily: '"Segoe UI", system-ui, sans-serif',
       fontSize: `${14 * uiScale}px`,
       color: '#888888'
@@ -2757,7 +2762,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.pauseSelector.setY(-30 + this.pauseSelectedOption * 40 * uiScale);
 
     // Sound - respect SFX setting
-    if (window.VIBE_SETTINGS?.sfxEnabled) {
+    if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) {
       Audio.playXPGain();
     }
   }
@@ -2775,13 +2780,13 @@ export default class ArenaScene extends Phaser.Scene {
         break;
 
       case 2: // RESTART
-        if (window.VIBE_SETTINGS?.sfxEnabled) Audio.playWeaponPickup();
+        if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) Audio.playWeaponPickup();
         this.destroyPauseMenu();
         this.restartGame();
         break;
 
       case 3: // QUIT TO TITLE
-        if (window.VIBE_SETTINGS?.sfxEnabled) Audio.playWeaponPickup();
+        if (window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) Audio.playWeaponPickup();
         this.destroyPauseMenu();
         this.quitToTitle();
         break;
@@ -2790,7 +2795,7 @@ export default class ArenaScene extends Phaser.Scene {
 
   showPauseSettings() {
     // Simple settings toggle in pause menu
-    const settings = window.VIBE_SETTINGS;
+    const settings = window.BYTE_SURVIVOR_SETTINGS;
     this.settingsOverlayOpen = true;
 
     // Create settings overlay
@@ -2953,11 +2958,11 @@ export default class ArenaScene extends Phaser.Scene {
     this.currentWeapon = { type: 'basic', duration: Infinity };
     this.clearOrbitals();
 
-    // Reset VIBE_CODER state
-    window.VIBE_CODER.xp = 0;
-    window.VIBE_CODER.level = 1;
-    window.VIBE_CODER.kills = 0;
-    window.VIBE_CODER.streak = 1;
+    // Reset BYTE_SURVIVOR state
+    window.BYTE_SURVIVOR.xp = 0;
+    window.BYTE_SURVIVOR.level = 1;
+    window.BYTE_SURVIVOR.kills = 0;
+    window.BYTE_SURVIVOR.streak = 1;
 
     // Clear saved run (fresh restart)
     SaveManager.clearSave();
@@ -3070,19 +3075,19 @@ export default class ArenaScene extends Phaser.Scene {
    * Auto-save current run state at wave completion
    */
   autoSaveRun() {
-    const vibeState = window.VIBE_CODER;
+    const survivorState = window.BYTE_SURVIVOR;
 
     const saveData = {
       wave: this.waveNumber,
       stage: this.currentStage,
       player: {
-        level: vibeState.level,
-        xp: vibeState.xp,
-        totalXP: vibeState.totalXP,
+        level: survivorState.level,
+        xp: survivorState.xp,
+        totalXP: survivorState.totalXP,
         health: this.player.health,
         maxHealth: this.player.maxHealth || this.baseStats.maxHealth,
-        kills: vibeState.kills,
-        streak: vibeState.streak || 0
+        kills: survivorState.kills,
+        streak: survivorState.streak || 0
       },
       weapons: {
         current: this.currentWeapon,
@@ -3197,7 +3202,7 @@ export default class ArenaScene extends Phaser.Scene {
     rebirthBtn.on('pointerout', () => rebirthBtn.setColor('#00ff00'));
     rebirthBtn.on('pointerdown', () => {
       // Perform rebirth
-      RebirthManager.performRebirth(this.waveNumber, window.VIBE_CODER.kills);
+      RebirthManager.performRebirth(this.waveNumber, window.BYTE_SURVIVOR.kills);
       elements.forEach(el => el.destroy());
       this.isPaused = false;
 
@@ -3556,8 +3561,8 @@ export default class ArenaScene extends Phaser.Scene {
       killCount++;
       // Apply event and modifier XP multipliers
       const xpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-      window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * xpMult));
-      window.VIBE_CODER.kills++;
+      window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * xpMult));
+      window.BYTE_SURVIVOR.kills++;
 
       // Death particle
       for (let i = 0; i < 3; i++) {
@@ -3808,8 +3813,8 @@ export default class ArenaScene extends Phaser.Scene {
           onComplete: () => {
             if (enemy.active) {
               // Award XP for magnetized enemies
-              window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * 0.5));
-              window.VIBE_CODER.kills++;
+              window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * 0.5));
+              window.BYTE_SURVIVOR.kills++;
 
               // Death effect
               const particle = this.add.circle(enemy.x, enemy.y, 15, 0x00ffff, 0.8);
@@ -3871,8 +3876,8 @@ export default class ArenaScene extends Phaser.Scene {
 
           if (enemy.health <= 0) {
             const xpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-            window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * xpMult));
-            window.VIBE_CODER.kills++;
+            window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * xpMult));
+            window.BYTE_SURVIVOR.kills++;
             if (Math.random() < 0.1) this.spawnWeaponDrop(enemy.x, enemy.y);
             this.tryBarkOnKill();
             enemy.destroy();
@@ -3959,7 +3964,7 @@ export default class ArenaScene extends Phaser.Scene {
   // === LEGENDARY WEAPONS ===
 
   spawnEquippedLegendary() {
-    const legendaries = window.VIBE_LEGENDARIES;
+    const legendaries = window.BYTE_SURVIVOR_LEGENDARIES;
     if (!legendaries) return;
 
     const equipped = legendaries.getEquipped();
@@ -4113,8 +4118,8 @@ export default class ArenaScene extends Phaser.Scene {
               this.checkLegendaryDrop(enemy.x, enemy.y);
 
               const xpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-              window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * xpMult));
-              window.VIBE_CODER.kills++;
+              window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * xpMult));
+              window.BYTE_SURVIVOR.kills++;
               if (Math.random() < 0.15) this.spawnWeaponDrop(enemy.x, enemy.y);
               enemy.destroy();
               this.updateHUD();
@@ -4126,7 +4131,7 @@ export default class ArenaScene extends Phaser.Scene {
   }
 
   checkLegendaryDrop(x, y) {
-    const legendaries = window.VIBE_LEGENDARIES;
+    const legendaries = window.BYTE_SURVIVOR_LEGENDARIES;
     if (!legendaries) return;
 
     // Check each legendary for drop
@@ -4273,8 +4278,8 @@ export default class ArenaScene extends Phaser.Scene {
     if (enemy.health <= 0) {
       // Award XP (apply event and modifier multipliers)
       const xpMult = (this.xpEventMultiplier || 1) * (this.modifierEffects?.xpMult || 1);
-      window.VIBE_CODER.addXP(Math.floor(enemy.xpValue * xpMult));
-      window.VIBE_CODER.kills++;
+      window.BYTE_SURVIVOR.addXP(Math.floor(enemy.xpValue * xpMult));
+      window.BYTE_SURVIVOR.kills++;
 
       // GIT CONFLICT: Split into 2 smaller enemies on death
       if (enemy.behavior === 'split' && enemy.canSplit) {
@@ -4523,10 +4528,10 @@ export default class ArenaScene extends Phaser.Scene {
       this.player.setDepth(-1);
     } catch (_) {}
 
-    const state = window.VIBE_CODER;
-    const settings = window.VIBE_SETTINGS;
+    const state = window.BYTE_SURVIVOR;
+    const settings = window.BYTE_SURVIVOR_SETTINGS;
 
-    console.log('[Cosmic Coder] Game over: wave=' + this.waveNumber + ' score=' + Math.floor(state.totalXP));
+    console.log('[ByteSurvivor] Game over: wave=' + this.waveNumber + ' score=' + Math.floor(state.totalXP));
 
     // Save high score before going to menu
     const isNewHighWave = this.waveNumber > this.highWave;
@@ -4545,9 +4550,9 @@ export default class ArenaScene extends Phaser.Scene {
     });
 
     // Add run to leaderboard — save locally immediately, then submit on-chain (no duplicate local entries)
-    // Use custom playerName if set, otherwise the selected character's display name (VoidNull, Vibecoder, SyncStorm)
-    const charId = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.VIBE_SELECTED_CHARACTER ?? 'vibecoder';
-    const char = typeof window !== 'undefined' && window.VIBE_CHARACTERS ? window.VIBE_CHARACTERS[charId] : null;
+    // Use custom playerName if set, otherwise the selected character's display name (VoidNull, ByteSurvivor, SyncStorm)
+    const charId = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.BYTE_SURVIVOR_SELECTED_CHARACTER ?? 'bytesurvivor';
+    const char = typeof window !== 'undefined' && window.BYTE_SURVIVOR_CHARACTERS ? window.BYTE_SURVIVOR_CHARACTERS[charId] : null;
     const characterDisplayName = char ? (char.displayName_en || char.displayName || char.name || '') : '';
     const localName = (settings.playerName && String(settings.playerName).trim()) || characterDisplayName || 'Anonymous';
     const runScore = Math.floor(state.totalXP);
@@ -4567,10 +4572,11 @@ export default class ArenaScene extends Phaser.Scene {
       // Persist ranked-history locally so returning players always get the ZK starter drop
       try {
         if (this.gameMode === 'zk_ranked') {
-          const raw = localStorage.getItem('cosmicCoderRankedHistory');
+          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY)
+            ?? localStorage.getItem(LEGACY_STORAGE_RANKED_HISTORY);
           const map = raw ? JSON.parse(raw) : {};
           map[addr] = true;
-          localStorage.setItem('cosmicCoderRankedHistory', JSON.stringify(map));
+          localStorage.setItem(STORAGE_RANKED_HISTORY, JSON.stringify(map));
         }
       } catch (_) {}
 
@@ -4593,7 +4599,7 @@ export default class ArenaScene extends Phaser.Scene {
     let totalBits = waveBits + killBits + xpBits;
 
     // Award bits immediately (don't defer — scene may be destroyed before promise resolves)
-    window.VIBE_UPGRADES.addCurrency(totalBits);
+    window.BYTE_SURVIVOR_UPGRADES.addCurrency(totalBits);
 
     // Game over UI
     const cx = this.scale.width / 2;
@@ -4676,7 +4682,7 @@ export default class ArenaScene extends Phaser.Scene {
     gameOverContainer.add(leaderboardLoading);
 
     const leaderboardRowObjects = [];
-    const playerNameFromSettings = () => (window.VIBE_SETTINGS?.playerName || 'Anonymous').trim() || 'Anonymous';
+    const playerNameFromSettings = () => (window.BYTE_SURVIVOR_SETTINGS?.playerName || 'Anonymous').trim() || 'Anonymous';
 
     const renderLeaderboard = async (onRankReady) => {
       while (leaderboardRowObjects.length) {
@@ -4870,10 +4876,10 @@ export default class ArenaScene extends Phaser.Scene {
     let deathSpriteKey = this.gameOverDeathSpriteKey ?? null;
     let deathAnimKey = this.gameOverDeathAnimKey ?? null;
     if (!deathSpriteKey || !deathAnimKey) {
-      const characterId = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.VIBE_SELECTED_CHARACTER ?? 'vibecoder';
+      const characterId = this.playingCharacterId ?? progressStore?.selectedCharacter ?? window.BYTE_SURVIVOR_SELECTED_CHARACTER ?? 'bytesurvivor';
       if (characterId === 'destroyer') { deathSpriteKey = 'destroyer-death'; deathAnimKey = 'destroyer-death'; }
       else if (characterId === 'swordsman') { deathSpriteKey = 'swordsman-death'; deathAnimKey = 'swordsman-death'; }
-      else { deathSpriteKey = 'vibecoder-death'; deathAnimKey = 'vibecoder-death'; }
+      else { deathSpriteKey = 'bytesurvivor-death'; deathAnimKey = 'bytesurvivor-death'; }
     }
 
     let animDurationMs = 1200;
@@ -4972,7 +4978,7 @@ export default class ArenaScene extends Phaser.Scene {
     this.tweens.add({ targets: phraseText, alpha: 1, duration: 800, delay: uiDelay + 300, ease: 'Power2' });
 
     // Game name branding
-    const gameBrandText = this.add.text(cx, h - 22, 'Cosmic Coder', {
+    const gameBrandText = this.add.text(cx, h - 22, 'ByteSurvivor', {
       fontFamily: 'monospace',
       fontSize: '12px',
       color: '#444466'
@@ -5190,15 +5196,15 @@ export default class ArenaScene extends Phaser.Scene {
           console.error('ZK ERROR DETAILS:', e);
           console.error('ZK ERROR STACK:', e?.stack);
           console.error('ZK ERROR MESSAGE:', e?.message);
-          console.warn('[Cosmic Coder] Submit failed:', e?.message || e);
+          console.warn('[ByteSurvivor] Submit failed:', e?.message || e);
           
           // Check for wrong network (txBadAuth / Freighter on Mainnet)
           const msg = e?.message || '';
           const isChunk404 = msg.includes('Failed to fetch dynamically imported module') || msg.includes('dynamically imported module');
           if (isChunk404) {
-            console.warn('[Cosmic Coder] ZK chunk 404 (stale cache). Hard refresh. Prover URL:', gameClient.getZkProverUrl());
+            console.warn('[ByteSurvivor] ZK chunk 404 (stale cache). Hard refresh. Prover URL:', gameClient.getZkProverUrl());
             try {
-              zkStatusText.setText('Hard refresh to load ZK (Ctrl+Shift+R). Prover: cosmic-coder-zk-prover.onrender.com').setAlpha(1);
+              zkStatusText.setText('Hard refresh to load ZK (Ctrl+Shift+R). Prover: bytesurvivor-zk-prover.onrender.com').setAlpha(1);
             } catch (_) {}
           } else if (msg.includes('Freighter is on') || msg.includes('txBadAuth') || msg.includes('Stellar Testnet')) {
             try { zkStatusText.setText('Switch Freighter to Testnet, then try again. Using local leaderboard.').setAlpha(1); } catch (_) {}
@@ -5331,7 +5337,7 @@ export default class ArenaScene extends Phaser.Scene {
 
       if (status && status.status === 'zk' && BALANCE.ZK_BITS_MULTIPLIER) {
         const bonus = Math.floor(totalBits * (BALANCE.ZK_BITS_MULTIPLIER - 1));
-        window.VIBE_UPGRADES.addCurrency(bonus);
+        window.BYTE_SURVIVOR_UPGRADES.addCurrency(bonus);
       }
     });
   }
@@ -5638,8 +5644,8 @@ export default class ArenaScene extends Phaser.Scene {
    * Immortal Mode respawn - continue wave with XP penalty
    */
   immortalModeRespawn() {
-    const state = window.VIBE_CODER;
-    const settings = window.VIBE_SETTINGS;
+    const state = window.BYTE_SURVIVOR;
+    const settings = window.BYTE_SURVIVOR_SETTINGS;
 
     // Apply XP penalty
     const xpLost = Math.floor(state.xp * settings.xpPenaltyOnDeath);
@@ -5774,7 +5780,7 @@ export default class ArenaScene extends Phaser.Scene {
         if (manualRight) vx = 1;
         if (manualUp) vy = -1;
         if (manualDown) vy = 1;
-      } else if (!hasTouchInput && window.VIBE_SETTINGS.autoMove && window.VIBE_CODER.isCodingActive()) {
+      } else if (!hasTouchInput && window.BYTE_SURVIVOR_SETTINGS.autoMove && window.BYTE_SURVIVOR.isCodingActive()) {
         // Auto-move: find safest direction (away from enemies)
         const autoMove = this.calculateAutoMove();
         vx = autoMove.x;
@@ -5814,7 +5820,7 @@ export default class ArenaScene extends Phaser.Scene {
       }
 
       // Update auto-move indicator position and mode emoji
-      const isAutoMoving = !hasKeyboardInput && !hasTouchInput && window.VIBE_SETTINGS?.autoMove && window.VIBE_CODER?.isCodingActive();
+      const isAutoMoving = !hasKeyboardInput && !hasTouchInput && window.BYTE_SURVIVOR_SETTINGS?.autoMove && window.BYTE_SURVIVOR?.isCodingActive();
       this.hudMode = hasKeyboardInput || hasTouchInput ? 'manual' : (isAutoMoving ? this.autoPlayMode : 'idle');
 
       if (this.autoMoveIndicator) {

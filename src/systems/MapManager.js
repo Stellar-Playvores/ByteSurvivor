@@ -512,7 +512,7 @@ export default class MapManager {
       }
     } else {
       // XP burst
-      window.VIBE_CODER.addXP(Phaser.Math.Between(5, 15));
+      window.BYTE_SURVIVOR.addXP(Phaser.Math.Between(5, 15));
     }
 
     destructible.destroy();

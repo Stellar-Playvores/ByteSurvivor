@@ -1,4 +1,4 @@
-# ZK Prover server for Cosmic Coder (POST /zk/prove).
+# ZK Prover server for ByteSurvivor (POST /zk/prove).
 # Requires circuits/build/ with GameRun_final.zkey and GameRun_js/ (commit them or build in CI).
 FROM node:20-bookworm-slim
 

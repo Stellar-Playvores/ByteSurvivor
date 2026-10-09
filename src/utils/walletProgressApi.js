@@ -4,7 +4,7 @@
  * Progress is keyed by wallet address — no cookies/localStorage.
  */
 
-const PRODUCTION_API = 'https://cosmic-coder-zk-prover.onrender.com';
+const PRODUCTION_API = 'https://bytesurvivor-zk-prover.onrender.com';
 
 function getProgressApiUrl() {
   return (typeof window !== 'undefined' && window.__VITE_CONFIG__?.VITE_PROGRESS_API_URL) ||

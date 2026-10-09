@@ -1,5 +1,5 @@
 /**
- * Cosmic Coder — Balance & difficulty tuning
+ * ByteSurvivor — Balance & difficulty tuning
  * Escalado de enemigos, nerfeo de armas, AFK y feedback de dificultad.
  *
  * Enemy scaling: damage/speed/spawn by wave.

@@ -12,9 +12,11 @@ marked.setOptions({
  */
 const docImports = import.meta.glob('../**/*.md', { query: '?raw', import: 'default' });
 
-const DOCS_LANG_KEY = 'cosmicCoderDocsLang'; // 'en' | 'es'
+const DOCS_LANG_KEY = 'byteSurvivorDocsLang'; // 'en' | 'es'
+const LEGACY_DOCS_LANG_KEY = 'cosmicCoderDocsLang';
 const DEFAULT_LANG = 'en';
-const DOCS_FONT_SCALE_KEY = 'cosmicCoderDocsFontScale';
+const DOCS_FONT_SCALE_KEY = 'byteSurvivorDocsFontScale';
+const LEGACY_DOCS_FONT_SCALE_KEY = 'cosmicCoderDocsFontScale';
 const FONT_SCALE_MIN = 0.85;
 const FONT_SCALE_MAX = 1.5;
 const FONT_SCALE_STEP = 0.1;
@@ -29,24 +31,24 @@ const CATEGORY_ORDER = [
 ];
 
 const TITLES = {
-  COSMIC_CODER_GUIDE: 'Game & Ranked ZK Guide',
+  BYTE_SURVIVOR_GUIDE: 'Game & Ranked ZK Guide',
   RANKED_ZK_SYSTEM: 'Ranked ZK system (formal)',
   TECHNICAL_DOCUMENTATION: 'Technical documentation',
   ZK_REAL_SETUP: 'ZK setup (Circom/zk_verifier)',
   STELLAR_ZK_REFERENCE: 'Stellar + ZK reference',
   SEP10_AUTH: 'SEP-10 authentication',
-  SUPABASE_COSMIC_CODER_SETUP: 'Supabase setup',
+  SUPABASE_BYTE_SURVIVOR_SETUP: 'Supabase setup',
   DEPLOY_GITHUB_IO: 'Deploy: GitHub Pages',
   DEPLOY_PROVER: 'Deploy: ZK prover',
   DEPLOY_RENDER_SEP10: 'Deploy: SEP-10 server',
   DEPLOY_ZK_STEPS: 'Deploy: contracts (testnet)',
   E2E_VERIFICATION: 'E2E verification',
   ZK_AND_BALANCE: 'ZK + balance notes',
-  HACKATHON_DO_THIS: 'Hackathon checklist'
+  DEPLOY_CHECKLIST: 'Deployment checklist'
 };
 
 const DESCS = {
-  COSMIC_CODER_GUIDE: 'How to play + how ranked ZK works end-to-end.',
+  BYTE_SURVIVOR_GUIDE: 'How to play + how ranked ZK works end-to-end.',
   RANKED_ZK_SYSTEM: 'Threat model, contracts, on-chain verification, replay protection.',
   TECHNICAL_DOCUMENTATION: 'Architecture, circuit public inputs, and contract semantics.',
   ZK_REAL_SETUP: 'Circuit build, prover artifacts, and troubleshooting.',
@@ -58,7 +60,7 @@ const DESCS = {
 
 function getPreferredLang() {
   try {
-    const v = localStorage.getItem(DOCS_LANG_KEY);
+    const v = localStorage.getItem(DOCS_LANG_KEY) ?? localStorage.getItem(LEGACY_DOCS_LANG_KEY);
     if (v === 'es' || v === 'en') return v;
   } catch (_) {}
   return DEFAULT_LANG;
@@ -72,7 +74,7 @@ function setPreferredLang(lang) {
 
 function getDocsFontScale() {
   try {
-    const v = parseFloat(localStorage.getItem(DOCS_FONT_SCALE_KEY));
+    const v = parseFloat(localStorage.getItem(DOCS_FONT_SCALE_KEY) ?? localStorage.getItem(LEGACY_DOCS_FONT_SCALE_KEY));
     if (Number.isFinite(v) && v >= FONT_SCALE_MIN && v <= FONT_SCALE_MAX) return v;
   } catch (_) {}
   return 1;
@@ -92,7 +94,7 @@ function applyDocsFontScale() {
 }
 
 function normalizeIdFromPath(p) {
-  // p like "../COSMIC_CODER_GUIDE.md" or "../plans/2026-01-21-foo.md"
+  // p like "../BYTE_SURVIVOR_GUIDE.md" or "../plans/2026-01-21-foo.md"
   const cleaned = String(p).replace(/^\.\.\//, '').replace(/\.md$/i, '');
   return cleaned.replaceAll('/', '__');
 }
@@ -115,7 +117,7 @@ function parseId(id) {
 }
 
 function categoryForBaseId(baseId) {
-  if (baseId === 'COSMIC_CODER_GUIDE') return 'Overview';
+  if (baseId === 'BYTE_SURVIVOR_GUIDE') return 'Overview';
   if (baseId === 'RANKED_ZK_SYSTEM') return 'Ranked ZK';
   if (baseId === 'TECHNICAL_DOCUMENTATION') return 'Contracts';
   if (baseId.includes('DEPLOY') || baseId.includes('SUPABASE')) return 'Setup & Deploy';
@@ -137,11 +139,11 @@ function descForBaseId(baseId) {
 function detectPreferredGuideVariant(availableIds, preferredLang = DEFAULT_LANG) {
   const prefersEs = preferredLang === 'es';
   // Default is English. Spanish is opt-in via toggle.
-  if (prefersEs && availableIds.includes('COSMIC_CODER_GUIDE_es')) return 'COSMIC_CODER_GUIDE_es';
-  if (!prefersEs && availableIds.includes('COSMIC_CODER_GUIDE_en')) return 'COSMIC_CODER_GUIDE_en';
-  if (availableIds.includes('COSMIC_CODER_GUIDE')) return 'COSMIC_CODER_GUIDE';
-  if (availableIds.includes('COSMIC_CODER_GUIDE_es')) return 'COSMIC_CODER_GUIDE_es';
-  if (availableIds.includes('COSMIC_CODER_GUIDE_en')) return 'COSMIC_CODER_GUIDE_en';
+  if (prefersEs && availableIds.includes('BYTE_SURVIVOR_GUIDE_es')) return 'BYTE_SURVIVOR_GUIDE_es';
+  if (!prefersEs && availableIds.includes('BYTE_SURVIVOR_GUIDE_en')) return 'BYTE_SURVIVOR_GUIDE_en';
+  if (availableIds.includes('BYTE_SURVIVOR_GUIDE')) return 'BYTE_SURVIVOR_GUIDE';
+  if (availableIds.includes('BYTE_SURVIVOR_GUIDE_es')) return 'BYTE_SURVIVOR_GUIDE_es';
+  if (availableIds.includes('BYTE_SURVIVOR_GUIDE_en')) return 'BYTE_SURVIVOR_GUIDE_en';
   return availableIds[0] || '';
 }
 
@@ -202,7 +204,7 @@ function buildDisplayCatalog(allDocs, preferredLang) {
 
   // Deterministic, curated ordering
   const order = [
-    'COSMIC_CODER_GUIDE',
+    'BYTE_SURVIVOR_GUIDE',
     'RANKED_ZK_SYSTEM',
     'TECHNICAL_DOCUMENTATION',
     'ZK_REAL_SETUP',
@@ -210,12 +212,12 @@ function buildDisplayCatalog(allDocs, preferredLang) {
     'STELLAR_ZK_REFERENCE',
     'E2E_VERIFICATION',
     'ZK_AND_BALANCE',
-    'SUPABASE_COSMIC_CODER_SETUP',
+    'SUPABASE_BYTE_SURVIVOR_SETUP',
     'DEPLOY_ZK_STEPS',
     'DEPLOY_PROVER',
     'DEPLOY_GITHUB_IO',
     'DEPLOY_RENDER_SEP10',
-    'HACKATHON_DO_THIS'
+    'DEPLOY_CHECKLIST'
   ];
   const rank = (baseId) => {
     const idx = order.indexOf(baseId);
@@ -258,8 +260,8 @@ function getRequestedId(rawHash, availableIds) {
   const hash = String(rawHash || '').replace(/^#/, '').trim();
   if (!hash) return '';
 
-  // Compatibility: old hash points to "COSMIC_CODER_GUIDE"
-  if (hash === 'COSMIC_CODER_GUIDE') {
+  // Compatibility: old hash points to "BYTE_SURVIVOR_GUIDE"
+  if (hash === 'BYTE_SURVIVOR_GUIDE') {
     return detectPreferredGuideVariant(availableIds, getPreferredLang());
   }
 
@@ -284,9 +286,9 @@ function renderShell(appEl, { displayDocs, activeId, query, preferredLang, allId
   const brand = document.createElement('div');
   brand.className = 'brand';
   brand.innerHTML = `
-    <div class="logo"><img src="${faviconUrl}" alt="Cosmic Coder" class="logoImg" /></div>
+    <div class="logo"><img src="${faviconUrl}" alt="ByteSurvivor" class="logoImg" /></div>
     <div class="title">
-      <div class="name">COSMIC CODER</div>
+      <div class="name">BYTE SURVIVOR</div>
       <div class="sub">Documentation</div>
     </div>
   `;

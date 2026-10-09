@@ -1,5 +1,5 @@
 #!/bin/bash
-# Vibe Coder XP Hook for OpenAI Codex CLI
+# ByteSurvivor XP Hook for OpenAI Codex CLI
 #
 # Usage: Add this to your Codex CLI workflow or pipe output through it
 # Example: codex "your prompt" | ./codex-hook.sh
@@ -14,7 +14,7 @@ else
   ACTION=$(cat)
 fi
 
-# Send to Vibe Coder server
+# Send to ByteSurvivor server
 curl -s -X POST http://localhost:3333/cli/codex \
   -H "Content-Type: application/json" \
   -d "{\"action\": \"codex_activity\", \"data\": {\"action\": \"$ACTION\"}}" \
@@ -22,5 +22,5 @@ curl -s -X POST http://localhost:3333/cli/codex \
   --max-time 2 \
   > /dev/null 2>&1 &
 
-echo "Codex XP sent to Vibe Coder!"
+echo "Codex XP sent to ByteSurvivor!"
 exit 0

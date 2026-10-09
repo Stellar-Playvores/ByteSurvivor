@@ -1,5 +1,5 @@
 {
-  "name": "vibe-coder",
+  "name": "bytesurvivor",
   "version": "0.7.6",
   "description": "Vampire Survivors-style idle game powered by your Claude Code activity",
   "type": "module",
@@ -62,8 +62,8 @@
     "wait-on": "^8.0.3"
   },
   "build": {
-    "appId": "com.cosmiccoder.app",
-    "productName": "Cosmic Coder",
+    "appId": "com.bytesurvivor.app",
+    "productName": "ByteSurvivor",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -102,7 +102,7 @@
       "gatekeeperAssess": false
     },
     "dmg": {
-      "title": "Cosmic Coder",
+      "title": "ByteSurvivor",
       "backgroundColor": "#1a1a2e",
       "window": {
         "width": 540,

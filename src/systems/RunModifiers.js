@@ -62,7 +62,8 @@ export default class RunModifiers {
   };
 
   // Storage key for persisting active modifiers
-  static STORAGE_KEY = 'vibeCoderModifiers';
+  static STORAGE_KEY = 'byteSurvivorModifiers';
+  static LEGACY_STORAGE_KEY = 'vibeCoderModifiers';
 
   /**
    * Select random modifiers for a new run
@@ -139,7 +140,7 @@ export default class RunModifiers {
    */
   static load() {
     try {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
+      const saved = localStorage.getItem(this.STORAGE_KEY) ?? localStorage.getItem(this.LEGACY_STORAGE_KEY);
       if (!saved) return [];
 
       const ids = JSON.parse(saved);
@@ -163,6 +164,7 @@ export default class RunModifiers {
    */
   static clear() {
     localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.LEGACY_STORAGE_KEY);
   }
 
   /**

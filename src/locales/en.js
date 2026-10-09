@@ -1,9 +1,9 @@
 /**
- * English locale for Cosmic Coder
+ * English locale for ByteSurvivor
  */
 export default {
   // Title & menu
-  title: 'COSMIC CODER',
+  title: 'BYTE SURVIVOR',
   subtitle: 'SURVIVE THE STELLAR FRONTIER',
   version: 'EXECUTE ORDER: SURVIVE();',
   menu: {
@@ -83,7 +83,7 @@ export default {
     mode_casual: 'MODE: CASUAL',
     zk_enabled: 'ZK PROOF: ENABLED',
     zk_disabled: 'ZK PROOF: DISABLED',
-    description: 'Cosmic Coder validates your run with Zero-Knowledge Proofs.\nScore is shown; wave is not revealed on-chain—only eligibility is confirmed.',
+    description: 'ByteSurvivor validates your run with Zero-Knowledge Proofs.\nScore is shown; wave is not revealed on-chain—only eligibility is confirmed.',
     zk_weapon_hint: 'ZK WEAPONS: Shotgun unlocks at 10+ score (for testing). When unlocked, it can appear as your starting weapon in Ranked (ZK) runs and is shown next to your character only if you have unlocked it. Other ZK weapons unlock at higher score tiers (Silver/Gold/Diamond).',
     zk_weapon_drop_rule_title: 'ZK WEAPONS — DROP RULE',
     zk_weapon_drop_rule: 'ZK weapon drops ONLY appear after you complete a full Zero Knowledge Ledger Proof. When your account has the hash and a successful on-chain submission, you can receive ZK weapon drops. Accounts that have not completed the proof cannot drop or pick up ZK weapons.',
@@ -302,7 +302,7 @@ export default {
     submit_error_contract: 'Contract error — verifier may not be set',
     submit_error_network: 'Network error — prover may be sleeping, try again',
     submit_error_prover_sleeping: 'ZK prover waking up — try again in 30s',
-    leaderboard_hint: 'To appear on chain leaderboard: connect wallet and configure the Cosmic Coder contract (config.json or .env).',
+    leaderboard_hint: 'To appear on chain leaderboard: connect wallet and configure the ByteSurvivor contract (config.json or .env).',
     start_match_failed: 'Could not start on-chain match. You can still play; sign in Freighter when starting to submit scores.',
     xp_lost: 'XP LOST',
     immortal_respawn: '♾️ IMMORTAL RESPAWN',
@@ -398,7 +398,7 @@ export default {
     deadlock: 'DEADLOCK'
   },
   barks: {
-    vibecoder: [
+    bytesurvivor: [
       'Awaiting async annihilation...',
       'My code compiles first try. Yours?',
       'Flow state reached. Stellar: 0ms.',

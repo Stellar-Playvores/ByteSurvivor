@@ -1,4 +1,4 @@
-// Procedural Audio System for Vibe Coder
+// Procedural Audio System for ByteSurvivor
 // Music/songs are inside the bundle (src/assets/audio) so deploy always has correct URLs
 import arcadeByLucjoUrl from '../assets/audio/arcade-by-lucjo.mp3';
 import deathSongUrl from '../assets/audio/death-song.mp3';
@@ -54,7 +54,7 @@ export function resumeAudio() {
 // Player shoot sound - quick blip
 export function playShoot() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -76,7 +76,7 @@ export function playShoot() {
 // Enemy hit sound - thud
 export function playHit() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -98,7 +98,7 @@ export function playHit() {
 // Enemy death sound - explosion
 export function playEnemyDeath() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   // Noise burst for explosion
   const bufferSize = audioContext.sampleRate * 0.2;
@@ -131,7 +131,7 @@ export function playEnemyDeath() {
 // Boss death - big explosion
 export function playBossDeath() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   // Multiple layered explosions
   for (let i = 0; i < 3; i++) {
@@ -168,7 +168,7 @@ export function playBossDeath() {
 // Player damage sound
 export function playPlayerHit() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -191,7 +191,7 @@ export function playPlayerHit() {
 // Level up fanfare
 export function playLevelUp() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
 
@@ -218,7 +218,7 @@ export function playLevelUp() {
 // Weapon pickup sound
 export function playWeaponPickup() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -241,7 +241,7 @@ export function playWeaponPickup() {
 // Evolution sound - epic!
 export function playEvolution() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   // Ascending arpeggio
   const notes = [261.63, 329.63, 392, 523.25, 659.25, 783.99, 1046.50];
@@ -275,7 +275,7 @@ export function playEvolution() {
 // XP gain - subtle blip
 export function playXPGain() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -297,7 +297,7 @@ export function playXPGain() {
 // Wave complete sound
 export function playWaveComplete() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const notes = [392, 523.25, 659.25]; // G4, C5, E5
 
@@ -324,7 +324,7 @@ export function playWaveComplete() {
 // Boss spawn warning
 export function playBossWarning() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   // Low rumble + warning beeps
   for (let i = 0; i < 3; i++) {
@@ -350,7 +350,7 @@ export function playBossWarning() {
 // rm -rf nuke sound
 export function playNuke() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   // Rising tone into massive explosion
   const osc = audioContext.createOscillator();
@@ -379,7 +379,7 @@ export function playNuke() {
 // Magnet sound
 export function playMagnet() {
   if (!audioContext) return;
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
 
   const osc = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -403,7 +403,7 @@ const QUIETER_VOLUME = 0.7;
 
 /** Play death song when player dies (slightly quieter). */
 export function playDeathSong() {
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
   try {
     const a = new Audio(deathSongUrl);
     a.volume = QUIETER_VOLUME;
@@ -416,7 +416,7 @@ export function playDeathSong() {
 /** Stop gameplay music and play game-over track once (no loop). Used when player dies. */
 export function playGameOverMusic() {
   stopGameplayMusic();
-  if (!window.VIBE_SETTINGS?.musicEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) return;
   try {
     const a = new Audio(gameOverMusicUrl);
     a.volume = getGameplayMusicVolume();
@@ -430,7 +430,7 @@ export function playGameOverMusic() {
 
 /** Play when character appears at game start. */
 export function playStartGameCharacter() {
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
   try {
     const a = new Audio(startGameCharacterUrl);
     a.volume = 1;
@@ -442,7 +442,7 @@ export function playStartGameCharacter() {
 
 /** Play level-up song (slightly quieter than normal). */
 export function playLevelUpSong() {
-  if (!window.VIBE_SETTINGS?.sfxEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.sfxEnabled) return;
   try {
     const a = new Audio(levelUpUrl);
     a.volume = QUIETER_VOLUME;
@@ -464,21 +464,21 @@ export function setMusicMode(mode) {
 }
 
 function getMenuMusicVolume() {
-  return window.VIBE_SETTINGS ? window.VIBE_SETTINGS.getEffectiveMenuMusicVolume() : 0.5;
+  return window.BYTE_SURVIVOR_SETTINGS ? window.BYTE_SURVIVOR_SETTINGS.getEffectiveMenuMusicVolume() : 0.5;
 }
 
 function getGameplayMusicVolume() {
-  return window.VIBE_SETTINGS ? window.VIBE_SETTINGS.getEffectiveGameplayMusicVolume() : 0.5;
+  return window.BYTE_SURVIVOR_SETTINGS ? window.BYTE_SURVIVOR_SETTINGS.getEffectiveGameplayMusicVolume() : 0.5;
 }
 
 export function updateMenuMusicVolume() {
-  if (menuAudio && window.VIBE_SETTINGS) {
+  if (menuAudio && window.BYTE_SURVIVOR_SETTINGS) {
     menuAudio.volume = getMenuMusicVolume();
   }
 }
 
 export function updateGameplayMusicVolume() {
-  if (gameplayAudio && window.VIBE_SETTINGS) {
+  if (gameplayAudio && window.BYTE_SURVIVOR_SETTINGS) {
     gameplayAudio.volume = getGameplayMusicVolume();
   }
 }
@@ -486,7 +486,7 @@ export function updateGameplayMusicVolume() {
 export function startMenuMusic() {
   stopGameplayMusic();
   stopMenuMusic();
-  if (!window.VIBE_SETTINGS?.musicEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) return;
 
   try {
     menuAudio = new Audio(getMenuMusicUrl());
@@ -511,7 +511,7 @@ export function stopMenuMusic() {
 }
 
 function playNextGameplayTrack() {
-  if (!window.VIBE_SETTINGS?.musicEnabled || !gameplayAudio) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.musicEnabled || !gameplayAudio) return;
   const playlist = getGameplayPlaylist();
   const url = playlist[gameplayTrackIndex];
   gameplayAudio.src = url;
@@ -523,7 +523,7 @@ function playNextGameplayTrack() {
 export function startGameplayMusic() {
   stopMenuMusic();
   stopGameplayMusic();
-  if (!window.VIBE_SETTINGS?.musicEnabled) return;
+  if (!window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) return;
 
   try {
     gameplayAudio = new Audio();
@@ -531,7 +531,7 @@ export function startGameplayMusic() {
 
     // Cuando termina una canción, pasa a la siguiente (cíclico)
     gameplayAudio.addEventListener('ended', () => {
-      if (!gameplayAudio || !window.VIBE_SETTINGS?.musicEnabled) return;
+      if (!gameplayAudio || !window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) return;
       gameplayTrackIndex = (gameplayTrackIndex + 1) % getGameplayPlaylist().length;
       playNextGameplayTrack();
     });
@@ -599,7 +599,7 @@ export function toggleMusic() {
 
 // Arena calls this to start gameplay music (kept for compatibility)
 export function setTrack() {
-  if (window.VIBE_SETTINGS?.musicEnabled) {
+  if (window.BYTE_SURVIVOR_SETTINGS?.musicEnabled) {
     startGameplayMusic();
   }
 }

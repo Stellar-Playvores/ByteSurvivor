@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$PROJECT_DIR/build"
-SOURCE_IMAGE="$PROJECT_DIR/public/assets/sprites/player/vibe-coder-idle.png"
+SOURCE_IMAGE="$PROJECT_DIR/public/assets/sprites/player/bytesurvivor-idle.png"
 
 # Create build directory
 mkdir -p "$BUILD_DIR"

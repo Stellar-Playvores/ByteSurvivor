@@ -4,8 +4,8 @@
  *
  * Required env:
  * - SEP10_SERVER_SECRET_KEY: Server's Stellar secret key (S...) — used to sign challenge tx.
- * - SEP10_HOME_DOMAIN: Home domain (e.g. cosmiccoder.io) — appears in Manage Data key "<home_domain> auth".
- * - SEP10_WEB_AUTH_DOMAIN: Domain that issues the challenge (e.g. api.cosmiccoder.io or your Render URL).
+ * - SEP10_HOME_DOMAIN: Home domain (e.g. bytesurvivor.io) — appears in Manage Data key "<home_domain> auth".
+ * - SEP10_WEB_AUTH_DOMAIN: Domain that issues the challenge (e.g. api.bytesurvivor.io or your Render URL).
  * - SEP10_NETWORK_PASSPHRASE: Stellar network (e.g. "Test SDF Network ; September 2015" or "Public Global Stellar Network ; September 2015").
  * - JWT_SECRET: Secret for signing JWTs (opaque string).
  */
@@ -43,8 +43,8 @@ function pickHomeDomain() {
   const single = getEnv('SEP10_HOME_DOMAIN', '');
   if (single) return single;
   const many = getEnv('SEP10_HOME_DOMAINS', '');
-  if (!many) return 'cosmiccoder.io';
-  return many.split(',').map((d) => d.trim()).filter(Boolean)[0] || 'cosmiccoder.io';
+  if (!many) return 'bytesurvivor.io';
+  return many.split(',').map((d) => d.trim()).filter(Boolean)[0] || 'bytesurvivor.io';
 }
 export const SEP10_HOME_DOMAIN = pickHomeDomain();
 
@@ -63,7 +63,7 @@ function normalizeWebAuthDomain(urlOrDomain) {
   }
 }
 
-const rawWebAuthDomain = getEnv('SEP10_WEB_AUTH_DOMAIN', process.env.RENDER_EXTERNAL_URL || 'https://cosmic-coder.onrender.com');
+const rawWebAuthDomain = getEnv('SEP10_WEB_AUTH_DOMAIN', process.env.RENDER_EXTERNAL_URL || 'https://bytesurvivor.onrender.com');
 export const SEP10_WEB_AUTH_DOMAIN = normalizeWebAuthDomain(rawWebAuthDomain) || rawWebAuthDomain;
 export const SEP10_NETWORK_PASSPHRASE = getEnv('SEP10_NETWORK_PASSPHRASE', NETWORK_PASSPHRASES.testnet);
 export const SEP10_CHALLENGE_TIMEOUT = Math.min(

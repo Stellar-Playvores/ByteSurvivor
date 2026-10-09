@@ -1,4 +1,4 @@
-// Cosmic Coder - ZK run attestation v2 (BN254 / Groth16).
+// ByteSurvivor - ZK run attestation v2 (BN254 / Groth16).
 // Binds: run_hash (hi/lo), score, wave, nonce, season_id, challenge_id, player_address, contract_id, domain_separator.
 // Enforces: score >= wave * MIN_SCORE_PER_WAVE (5).
 pragma circom 2.1.4;

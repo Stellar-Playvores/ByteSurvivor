@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Vibe Coder will be documented in this file.
+All notable changes to ByteSurvivor will be documented in this file.
 
 ## [0.7.6] - 2026-02-12
 

@@ -41,7 +41,7 @@ describe('SaveManager', () => {
 
   describe('SAVE_KEY', () => {
     it('has expected storage key', () => {
-      expect(SaveManager.SAVE_KEY).toBe('vibeCoderRunSave');
+      expect(SaveManager.SAVE_KEY).toBe('byteSurvivorRunSave');
     });
   });
 
@@ -86,28 +86,28 @@ describe('SaveManager', () => {
       it('stores data under the correct key', () => {
         SaveManager.saveRun(validRunData());
         expect(localStorage.setItem).toHaveBeenCalledWith(
-          'vibeCoderRunSave',
+          'byteSurvivorRunSave',
           expect.any(String)
         );
       });
 
       it('saved data includes timestamp and version', () => {
         SaveManager.saveRun(validRunData());
-        const saved = JSON.parse(store['vibeCoderRunSave']);
+        const saved = JSON.parse(store['byteSurvivorRunSave']);
         expect(saved.timestamp).toBeGreaterThan(0);
         expect(saved.version).toBe(2);
       });
 
       it('preserves wave and stage', () => {
         SaveManager.saveRun(validRunData());
-        const saved = JSON.parse(store['vibeCoderRunSave']);
+        const saved = JSON.parse(store['byteSurvivorRunSave']);
         expect(saved.wave).toBe(12);
         expect(saved.stage).toBe(1);
       });
 
       it('preserves player stats', () => {
         SaveManager.saveRun(validRunData());
-        const saved = JSON.parse(store['vibeCoderRunSave']);
+        const saved = JSON.parse(store['byteSurvivorRunSave']);
         expect(saved.player.level).toBe(8);
         expect(saved.player.kills).toBe(47);
         expect(saved.player.health).toBe(150);
@@ -116,7 +116,7 @@ describe('SaveManager', () => {
 
       it('converts collected weapons Set-like array to plain array', () => {
         SaveManager.saveRun(validRunData());
-        const saved = JSON.parse(store['vibeCoderRunSave']);
+        const saved = JSON.parse(store['byteSurvivorRunSave']);
         expect(Array.isArray(saved.weapons.collected)).toBe(true);
         expect(saved.weapons.collected).toContain('spread');
       });
@@ -144,19 +144,19 @@ describe('SaveManager', () => {
       it('returns null for expired saves (>24h)', () => {
         // Manually store an old save
         const oldSave = { ...validRunData(), timestamp: Date.now() - 25 * 60 * 60 * 1000, version: 2 };
-        store['vibeCoderRunSave'] = JSON.stringify(oldSave);
+        store['byteSurvivorRunSave'] = JSON.stringify(oldSave);
         expect(SaveManager.loadRun()).toBeNull();
       });
 
       it('clears expired saves from storage', () => {
         const oldSave = { ...validRunData(), timestamp: Date.now() - 25 * 60 * 60 * 1000, version: 2 };
-        store['vibeCoderRunSave'] = JSON.stringify(oldSave);
+        store['byteSurvivorRunSave'] = JSON.stringify(oldSave);
         SaveManager.loadRun();
-        expect(localStorage.removeItem).toHaveBeenCalledWith('vibeCoderRunSave');
+        expect(localStorage.removeItem).toHaveBeenCalledWith('byteSurvivorRunSave');
       });
 
       it('returns null for corrupted JSON', () => {
-        store['vibeCoderRunSave'] = '{invalid json!!!';
+        store['byteSurvivorRunSave'] = '{invalid json!!!';
         expect(SaveManager.loadRun()).toBeNull();
       });
     });
@@ -176,7 +176,7 @@ describe('SaveManager', () => {
       it('removes save from storage', () => {
         SaveManager.saveRun(validRunData());
         SaveManager.clearSave();
-        expect(localStorage.removeItem).toHaveBeenCalledWith('vibeCoderRunSave');
+        expect(localStorage.removeItem).toHaveBeenCalledWith('byteSurvivorRunSave');
       });
 
       it('hasSave returns false after clear', () => {

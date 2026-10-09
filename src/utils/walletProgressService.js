@@ -7,18 +7,29 @@
 import * as stellarWallet from './stellarWallet.js';
 import { fetchProgress, saveProgress as apiSaveProgress } from './walletProgressApi.js';
 
-const LOCAL_PROGRESS_KEY = 'cosmicCoderProgressLocal';
+const LOCAL_PROGRESS_KEY = 'byteSurvivorProgressLocal';
+const LEGACY_LOCAL_PROGRESS_KEY = 'cosmicCoderProgressLocal';
+
+const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
+const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
+
+function normalizeCharId(id) {
+  const resolved = LEGACY_CHARS[id] ?? id;
+  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+}
 
 /** Global store for high wave/score and selected character (set on load) */
 export const progressStore = {
   highWave: 0,
   highScore: 0,
-  selectedCharacter: 'vibecoder'
+  selectedCharacter: 'bytesurvivor'
 };
 
 function loadLocalProgress() {
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LOCAL_PROGRESS_KEY) : null;
+    const raw = typeof localStorage !== 'undefined'
+      ? localStorage.getItem(LOCAL_PROGRESS_KEY) ?? localStorage.getItem(LEGACY_LOCAL_PROGRESS_KEY)
+      : null;
     if (!raw) return null;
     const o = JSON.parse(raw);
     return {
@@ -50,7 +61,7 @@ export function hydrateProgressFromLocal() {
 }
 
 /**
- * Load progress from API and hydrate VIBE_UPGRADES, VIBE_LEGENDARIES, SaveManager, progressStore.
+ * Load progress from API and hydrate BYTE_SURVIVOR_UPGRADES, BYTE_SURVIVOR_LEGENDARIES, SaveManager, progressStore.
  * @param {string} address - Wallet address
  * @returns {Promise<boolean>} true if loaded, false if failed or no data
  */
@@ -77,23 +88,22 @@ export async function loadProgressForWallet(address) {
   const legendaries = data.legendaries;
 
   if (upgrades && typeof upgrades === 'object') {
-    window.VIBE_UPGRADES.levels = upgrades.levels || {};
-    window.VIBE_UPGRADES.currency = typeof upgrades.currency === 'number' ? upgrades.currency : 0;
-    for (const key of Object.keys(window.VIBE_UPGRADES.upgrades)) {
-      if (window.VIBE_UPGRADES.levels[key] === undefined) window.VIBE_UPGRADES.levels[key] = 0;
+    window.BYTE_SURVIVOR_UPGRADES.levels = upgrades.levels || {};
+    window.BYTE_SURVIVOR_UPGRADES.currency = typeof upgrades.currency === 'number' ? upgrades.currency : 0;
+    for (const key of Object.keys(window.BYTE_SURVIVOR_UPGRADES.upgrades)) {
+      if (window.BYTE_SURVIVOR_UPGRADES.levels[key] === undefined) window.BYTE_SURVIVOR_UPGRADES.levels[key] = 0;
     }
   }
 
   if (legendaries && typeof legendaries === 'object') {
-    window.VIBE_LEGENDARIES.unlocked = Array.isArray(legendaries.unlocked) ? legendaries.unlocked : [];
-    window.VIBE_LEGENDARIES.equipped = legendaries.equipped || null;
+    window.BYTE_SURVIVOR_LEGENDARIES.unlocked = Array.isArray(legendaries.unlocked) ? legendaries.unlocked : [];
+    window.BYTE_SURVIVOR_LEGENDARIES.equipped = legendaries.equipped || null;
   }
 
   progressStore.highWave = typeof data.highWave === 'number' ? data.highWave : 0;
   progressStore.highScore = typeof data.highScore === 'number' ? data.highScore : 0;
-  const validChars = ['vibecoder', 'destroyer', 'swordsman'];
-  progressStore.selectedCharacter = validChars.includes(data.selectedCharacter) ? data.selectedCharacter : 'vibecoder';
-  if (typeof window !== 'undefined') window.VIBE_SELECTED_CHARACTER = progressStore.selectedCharacter;
+  progressStore.selectedCharacter = normalizeCharId(data.selectedCharacter);
+  if (typeof window !== 'undefined') window.BYTE_SURVIVOR_SELECTED_CHARACTER = progressStore.selectedCharacter;
 
   if (data.saveState && typeof data.saveState === 'object') {
     const SaveManager = (await import('../systems/SaveManager.js')).default;
@@ -115,19 +125,19 @@ export async function loadProgressForWallet(address) {
 export async function saveProgressToWallet(address, extra = {}) {
   if (!address) return false;
   const payload = {
-    upgrades: { levels: window.VIBE_UPGRADES?.levels || {}, currency: window.VIBE_UPGRADES?.currency ?? 0 },
-    legendaries: { unlocked: window.VIBE_LEGENDARIES?.unlocked || [], equipped: window.VIBE_LEGENDARIES?.equipped ?? null },
+    upgrades: { levels: window.BYTE_SURVIVOR_UPGRADES?.levels || {}, currency: window.BYTE_SURVIVOR_UPGRADES?.currency ?? 0 },
+    legendaries: { unlocked: window.BYTE_SURVIVOR_LEGENDARIES?.unlocked || [], equipped: window.BYTE_SURVIVOR_LEGENDARIES?.equipped ?? null },
     highWave: extra.highWave ?? progressStore.highWave,
     highScore: extra.highScore ?? progressStore.highScore,
     saveState: extra.saveState ?? (await import('../systems/SaveManager.js')).default.getSaveDataForWallet?.() ?? null,
-    selectedCharacter: extra.selectedCharacter ?? progressStore.selectedCharacter ?? window.VIBE_SELECTED_CHARACTER ?? 'vibecoder'
+    selectedCharacter: extra.selectedCharacter ?? progressStore.selectedCharacter ?? window.BYTE_SURVIVOR_SELECTED_CHARACTER ?? 'bytesurvivor'
   };
   const ok = await apiSaveProgress(address, payload);
   if (ok && extra.highWave != null) progressStore.highWave = extra.highWave;
   if (ok && extra.highScore != null) progressStore.highScore = extra.highScore;
   if (ok && extra.selectedCharacter != null) {
     progressStore.selectedCharacter = extra.selectedCharacter;
-    if (typeof window !== 'undefined') window.VIBE_SELECTED_CHARACTER = extra.selectedCharacter;
+    if (typeof window !== 'undefined') window.BYTE_SURVIVOR_SELECTED_CHARACTER = extra.selectedCharacter;
   }
   const hw = extra.highWave ?? progressStore.highWave;
   const hs = extra.highScore ?? progressStore.highScore;
@@ -140,20 +150,20 @@ export async function saveProgressToWallet(address, extra = {}) {
  * Reset progress to empty when wallet disconnects.
  */
 export function resetProgressForDisconnect() {
-  const upgrades = window.VIBE_UPGRADES?.upgrades;
+  const upgrades = window.BYTE_SURVIVOR_UPGRADES?.upgrades;
   if (upgrades) {
-    window.VIBE_UPGRADES.levels = {};
+    window.BYTE_SURVIVOR_UPGRADES.levels = {};
     for (const key of Object.keys(upgrades)) {
-      window.VIBE_UPGRADES.levels[key] = 0;
+      window.BYTE_SURVIVOR_UPGRADES.levels[key] = 0;
     }
-    window.VIBE_UPGRADES.currency = 0;
+    window.BYTE_SURVIVOR_UPGRADES.currency = 0;
   }
-  window.VIBE_LEGENDARIES.unlocked = [];
-  window.VIBE_LEGENDARIES.equipped = null;
+  window.BYTE_SURVIVOR_LEGENDARIES.unlocked = [];
+  window.BYTE_SURVIVOR_LEGENDARIES.equipped = null;
   progressStore.highWave = 0;
   progressStore.highScore = 0;
-  progressStore.selectedCharacter = 'vibecoder';
-  if (typeof window !== 'undefined') window.VIBE_SELECTED_CHARACTER = 'vibecoder';
+  progressStore.selectedCharacter = 'bytesurvivor';
+  if (typeof window !== 'undefined') window.BYTE_SURVIVOR_SELECTED_CHARACTER = 'bytesurvivor';
   import('../systems/SaveManager.js').then(({ default: SaveManager }) => SaveManager.clearSave());
 }
 
@@ -167,16 +177,15 @@ export async function persistIfWalletConnected() {
 }
 
 /** Character ids in order for cycling */
-const CHAR_ORDER = ['vibecoder', 'destroyer', 'swordsman'];
+const CHAR_ORDER = VALID_CHARS;
 
 /**
  * Select character and persist to wallet. Returns new character id.
  */
 export async function selectCharacter(charId) {
-  const valid = CHAR_ORDER.includes(charId);
-  const id = valid ? charId : 'vibecoder';
+  const id = normalizeCharId(charId);
   progressStore.selectedCharacter = id;
-  window.VIBE_SELECTED_CHARACTER = id;
+  window.BYTE_SURVIVOR_SELECTED_CHARACTER = id;
   const addr = await stellarWallet.getAddress();
   if (addr) await saveProgressToWallet(addr, { selectedCharacter: id });
   return id;
