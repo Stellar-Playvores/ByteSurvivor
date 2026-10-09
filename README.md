@@ -2,7 +2,7 @@
 
 **A vampire-survivors-style idle game where your coding activity powers your astronaut. Prove your runs on-chain with Stellar and zero-knowledge proofs.**
 
-**[Play Now](https://stellar-playvores.github.io/ByteSurvivor/) · [Setup Guide](./SETUP.md) · [Changelog](./CHANGELOG.md)**
+**[Play Now](https://bytesurvivor-games.vercel.app/) · [Setup Guide](./SETUP.md) · [Changelog](./CHANGELOG.md)**
 
 ---
 
@@ -24,11 +24,11 @@ Gameplay is **100% off-chain** (Phaser 3). Only match start, match end, and lead
 
 ## Characters
 
-| Character | Internal ID | Texture | Description |
-|-----------|-------------|---------|-------------|
-| **ByteSurvivor** | `bytesurvivor` | `player` | A former network architect whose consciousness merged with the terminal. Balanced stats. |
-| **VoidNull** | `destroyer` | `player-destroyer` | The ultimate security protocol — erases existence. High damage. |
-| **SyncStorm** | `swordsman` | `player-swordsman` | An electrical storm of data — fast and agile. High speed. |
+| Character        | Internal ID    | Texture            | Description                                                                              |
+| ---------------- | -------------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| **ByteSurvivor** | `bytesurvivor` | `player`           | A former network architect whose consciousness merged with the terminal. Balanced stats. |
+| **VoidNull**     | `destroyer`    | `player-destroyer` | The ultimate security protocol — erases existence. High damage.                          |
+| **SyncStorm**    | `swordsman`    | `player-swordsman` | An electrical storm of data — fast and agile. High speed.                                |
 
 Each character has dedicated death animation spritesheets (`ByteSurvivor/bytesurvivor-death.png`, `VoidNull/voidnull-death.png`, `SyncStorm/sync-death.png`). On game over, the death animation plays once and freezes on the last frame (character lying on the ground).
 
@@ -37,14 +37,16 @@ Each character has dedicated death animation spritesheets (`ByteSurvivor/bytesur
 ## Quick Start
 
 **Play in the browser (no install):**  
-**[https://stellar-playvores.github.io/ByteSurvivor/](https://stellar-playvores.github.io/ByteSurvivor/)**
+**[https://bytesurvivor-games.vercel.app/](https://bytesurvivor-games.vercel.app/)**
 
 On mobile, the game asks you to rotate to landscape. Connect your Freighter wallet on the title screen to play and submit to the leaderboard.
 
 **Run locally:**
+
 ```bash
 npm install && npm run dev
 ```
+
 Open http://localhost:3000. Optional: `npm run server` for the XP/prover backend.
 
 **Language:** English and Spanish in **Settings → Language** on the title screen.
@@ -96,24 +98,17 @@ If the ZK submission fails (prover offline, contract not deployed, etc.), the ga
 
 So: **Stellar** provides the chain and the Game Hub session lifecycle; **ZK** ensures that entries are provably valid without revealing full gameplay trace.
 
-### Backend URLs (Render)
-
-| URL | Purpose | Config key |
-|-----|---------|------------|
-| **https://bytesurvivor.onrender.com** | API: leaderboard, auth, progress. Used by the frontend for ranking and login. | `VITE_API_URL` / `VITE_LEADERBOARD_URL` |
-| **https://bytesurvivor-zk-prover.onrender.com** | ZK prover: generates Groth16 proofs from run data. Frontend sends score/wave/nonce and gets back a proof, then submits it to the contract with Freighter. | `VITE_ZK_PROVER_URL` |
-
 **Important:** `start_match` and all contract calls (start_match, submit_zk, submit_result) are **signed by the user in Freighter** and sent **directly to Stellar Testnet RPC**. They do **not** go through these URLs. If you get **txBadAuth**, the contract is rejecting the signature — set Freighter to **Stellar Testnet** (not Mainnet) and use the same account that is connected.
 
 ### Contracts on Stellar Testnet
 
-| Contract | Role | Stellar Expert |
-|----------|------|----------------|
-| **Game Hub** | Session lifecycle: `start_game`, `end_game` | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG) |
-| **Policy (ByteSurvivor)** | Our game: `start_match`, `submit_result`, `submit_zk`, leaderboard | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO) |
-| **Verifier (zk_verifier)** | BN254 Groth16 proof verification | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA) |
+| Contract                   | Role                                                               | Stellar Expert                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Game Hub**               | Session lifecycle: `start_game`, `end_game`                        | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG) |
+| **Policy (ByteSurvivor)**  | Our game: `start_match`, `submit_result`, `submit_zk`, leaderboard | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CC73YP4HYHXG42QQDYQGLG3HAQ3VQC2GF4E5Z7ILUOGZNR4M7EUIZBUO) |
+| **Verifier (zk_verifier)** | BN254 Groth16 proof verification                                   | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CCQQDZBSOREFGWRX7BJKG4S42CPYASWVOUFLTFNKV5IQ3STOJ7ROSOBA) |
 
-- **Play:** [ByteSurvivor](https://stellar-playvores.github.io/ByteSurvivor/)
+- **Play:** [ByteSurvivor](https://bytesurvivor-games.vercel.app/)
 - **Deploy contracts & prover:** [docs/DEPLOY_ZK_STEPS.md](docs/DEPLOY_ZK_STEPS.md)
 
 ### ZK details
@@ -181,4 +176,4 @@ For contract and prover deployment (Testnet + Render or similar), see [docs/DEPL
 
 ---
 
-*Code to Conquer.*
+_Code to Conquer._
