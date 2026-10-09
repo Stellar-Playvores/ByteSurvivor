@@ -8,14 +8,11 @@ import * as stellarWallet from './stellarWallet.js';
 import { fetchProgress, saveProgress as apiSaveProgress } from './walletProgressApi.js';
 
 const LOCAL_PROGRESS_KEY = 'byteSurvivorProgressLocal';
-const LEGACY_LOCAL_PROGRESS_KEY = 'cosmicCoderProgressLocal';
 
 const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
-const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
 
 function normalizeCharId(id) {
-  const resolved = LEGACY_CHARS[id] ?? id;
-  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+  return VALID_CHARS.includes(id) ? id : 'bytesurvivor';
 }
 
 /** Global store for high wave/score and selected character (set on load) */
@@ -27,9 +24,7 @@ export const progressStore = {
 
 function loadLocalProgress() {
   try {
-    const raw = typeof localStorage !== 'undefined'
-      ? localStorage.getItem(LOCAL_PROGRESS_KEY) ?? localStorage.getItem(LEGACY_LOCAL_PROGRESS_KEY)
-      : null;
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LOCAL_PROGRESS_KEY) : null;
     if (!raw) return null;
     const o = JSON.parse(raw);
     return {

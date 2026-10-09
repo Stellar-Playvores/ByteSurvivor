@@ -6,7 +6,6 @@
  */
 
 const STORAGE_KEY = 'byteSurvivorJwt';
-const LEGACY_STORAGE_KEY = 'cosmicCoderJwt';
 
 /** Default backend when no env is set (e.g. build without .env). */
 const DEFAULT_API_BASE = 'https://bytesurvivor.onrender.com';
@@ -33,7 +32,7 @@ let inMemoryToken = null;
 export function getStoredToken() {
   if (inMemoryToken) return inMemoryToken;
   try {
-    const t = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    const t = localStorage.getItem(STORAGE_KEY);
     if (t) inMemoryToken = t;
     return t;
   } catch (_) {}
@@ -44,10 +43,7 @@ export function setStoredToken(token) {
   inMemoryToken = token;
   try {
     if (token) localStorage.setItem(STORAGE_KEY, token);
-    else {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-    }
+    else localStorage.removeItem(STORAGE_KEY);
   } catch (_) {}
 }
 
@@ -55,7 +51,6 @@ export function clearStoredToken() {
   inMemoryToken = null;
   try {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch (_) {}
 }
 

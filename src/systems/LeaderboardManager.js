@@ -5,9 +5,7 @@
  * results are always active (see docs/SUPABASE_BYTE_SURVIVOR_SETUP.md).
  */
 const STORAGE_KEY = 'byteSurvivorLeaderboard';
-const LEGACY_STORAGE_KEY = 'cosmicCoderLeaderboard';
 const LOCAL_GAMES_KEY = 'byteSurvivorGamesPlayed';
-const LEGACY_LOCAL_GAMES_KEY = 'cosmicCoderGamesPlayed';
 const MAX_ENTRIES = 10;
 
 function getLeaderboardApiUrl() {
@@ -29,7 +27,7 @@ export default class LeaderboardManager {
    */
   static load() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
         return Array.isArray(data) ? data : [];
@@ -52,7 +50,6 @@ export default class LeaderboardManager {
   static reset() {
     try {
       localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
     } catch (e) {
       console.warn('Leaderboard reset failed:', e);
     }
@@ -167,7 +164,7 @@ export default class LeaderboardManager {
   static getLocalGamesPlayed(address) {
     if (!address) return 0;
     try {
-      const raw = localStorage.getItem(LOCAL_GAMES_KEY) ?? localStorage.getItem(LEGACY_LOCAL_GAMES_KEY);
+      const raw = localStorage.getItem(LOCAL_GAMES_KEY);
       const map = raw ? JSON.parse(raw) : {};
       const count = map[String(address)];
       return typeof count === 'number' && count >= 0 ? count : 0;
@@ -183,7 +180,7 @@ export default class LeaderboardManager {
   static incrementLocalGamesPlayed(address) {
     if (!address) return;
     try {
-      const raw = localStorage.getItem(LOCAL_GAMES_KEY) ?? localStorage.getItem(LEGACY_LOCAL_GAMES_KEY);
+      const raw = localStorage.getItem(LOCAL_GAMES_KEY);
       const map = raw ? JSON.parse(raw) : {};
       const key = String(address);
       map[key] = (map[key] ?? 0) + 1;

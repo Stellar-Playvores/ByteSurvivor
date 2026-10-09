@@ -7,11 +7,9 @@ import { getSupabase } from './supabase.js';
 
 export const PROGRESS_TABLE = 'bytesurvivor_progress';
 const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
-const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
 
 function normalizeCharId(id) {
-  const resolved = LEGACY_CHARS[id] ?? id;
-  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+  return VALID_CHARS.includes(id) ? id : 'bytesurvivor';
 }
 
 /**

@@ -2,9 +2,10 @@
 
 Current project: **https://pdfflyvkkgtvsujiafkf.supabase.co**
 
-> **Existing database (`cosmic_coder_*` tables):** before continuing, run
-> `server/db/migrate_bytesurvivor_rename.sql` in the SQL Editor to rename them to
-> `bytesurvivor_*`. The SQL below is only for new databases.
+> The SQL below is for new databases. If your database already has tables under a
+> different name, rename them to `bytesurvivor_users` / `bytesurvivor_leaderboard` /
+> `bytesurvivor_progress` in the SQL Editor before pointing the backend at them
+> (`ALTER TABLE <old_name> RENAME TO bytesurvivor_users;`).
 
 ---
 

@@ -9,12 +9,11 @@ import Freighter from '@stellar/freighter-api';
 let cachedAddress = null;
 
 const STORAGE_KEY = 'byteSurvivorWalletAddress';
-const LEGACY_STORAGE_KEY = 'cosmicCoderWalletAddress';
 const TESTNET_PASSPHRASE = 'Test SDF Network ; September 2015';
 
 function loadCached() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) cachedAddress = saved;
   } catch (_) {}
 }
@@ -82,7 +81,7 @@ export function confirmConnection(address) {
 export async function getAddress() {
   if (cachedAddress) return cachedAddress;
   try {
-    const saved = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       cachedAddress = saved;
       return cachedAddress;
@@ -98,7 +97,6 @@ export function disconnect() {
   cachedAddress = null;
   try {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch (_) {}
 }
 

@@ -4,7 +4,6 @@
  */
 export default class SaveManager {
   static SAVE_KEY = 'byteSurvivorRunSave';
-  static LEGACY_SAVE_KEY = 'vibeCoderRunSave';
 
   /**
    * Save current run state
@@ -48,7 +47,7 @@ export default class SaveManager {
    */
   static loadRun() {
     try {
-      const saved = localStorage.getItem(this.SAVE_KEY) ?? localStorage.getItem(this.LEGACY_SAVE_KEY);
+      const saved = localStorage.getItem(this.SAVE_KEY);
       if (!saved) return null;
 
       const data = JSON.parse(saved);
@@ -99,7 +98,6 @@ export default class SaveManager {
    */
   static clearSave() {
     localStorage.removeItem(this.SAVE_KEY);
-    localStorage.removeItem(this.LEGACY_SAVE_KEY);
   }
 
   /**
@@ -120,7 +118,7 @@ export default class SaveManager {
    * @returns {object|null}
    */
   static getSaveDataForWallet() {
-    const saved = localStorage.getItem(this.SAVE_KEY) ?? localStorage.getItem(this.LEGACY_SAVE_KEY);
+    const saved = localStorage.getItem(this.SAVE_KEY);
     if (!saved) return null;
     try {
       return JSON.parse(saved);

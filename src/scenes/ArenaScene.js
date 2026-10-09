@@ -24,14 +24,11 @@ import * as BALANCE from '../config/balance.js';
 
 /** localStorage key: set to '1' once user has signed a ZK proof at least once. Weapon drops only allowed after that. */
 const STORAGE_HAS_SIGNED_ZK_ONCE = 'byteSurvivorHasSignedZkOnce';
-const LEGACY_STORAGE_HAS_SIGNED_ZK_ONCE = 'cosmicCoderHasSignedZkOnce';
 const STORAGE_RANKED_HISTORY = 'byteSurvivorRankedHistory';
-const LEGACY_STORAGE_RANKED_HISTORY = 'cosmicCoderRankedHistory';
 
 function hasSignedZkOnce() {
   try {
-    return (localStorage.getItem(STORAGE_HAS_SIGNED_ZK_ONCE)
-      ?? localStorage.getItem(LEGACY_STORAGE_HAS_SIGNED_ZK_ONCE)) === '1';
+    return localStorage.getItem(STORAGE_HAS_SIGNED_ZK_ONCE) === '1';
   } catch (_) {
     return false;
   }
@@ -428,8 +425,7 @@ export default class ArenaScene extends Phaser.Scene {
         // always treat as returning even if on-chain queries fail.
         let localRankedHistory = false;
         try {
-          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY)
-            ?? localStorage.getItem(LEGACY_STORAGE_RANKED_HISTORY);
+          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY);
           const map = raw ? JSON.parse(raw) : {};
           localRankedHistory = !!map?.[addr];
         } catch (_) {}
@@ -841,7 +837,7 @@ export default class ArenaScene extends Phaser.Scene {
     const arenaBgKey = `arena-bg-${arenaBgIndex}`;
 
     if (this.textures.exists(arenaBgKey)) {
-      // Use preloaded cosmic/cyber space image — full world, centered, scaled to cover
+      // Use preloaded deep-space image — full world, centered, scaled to cover
       this.bgImageSprite = this.add.image(this.worldWidth / 2, this.worldHeight / 2, arenaBgKey);
       this.bgImageSprite.setDisplaySize(this.worldWidth, this.worldHeight);
       this.bgImageSprite.setDepth(-10);
@@ -4572,8 +4568,7 @@ export default class ArenaScene extends Phaser.Scene {
       // Persist ranked-history locally so returning players always get the ZK starter drop
       try {
         if (this.gameMode === 'zk_ranked') {
-          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY)
-            ?? localStorage.getItem(LEGACY_STORAGE_RANKED_HISTORY);
+          const raw = localStorage.getItem(STORAGE_RANKED_HISTORY);
           const map = raw ? JSON.parse(raw) : {};
           map[addr] = true;
           localStorage.setItem(STORAGE_RANKED_HISTORY, JSON.stringify(map));

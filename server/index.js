@@ -21,11 +21,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const VALID_CHARS = ['bytesurvivor', 'destroyer', 'swordsman'];
-const LEGACY_CHARS = { vibecoder: 'bytesurvivor' };
 
 function normalizeCharId(id) {
-  const resolved = LEGACY_CHARS[id] ?? id;
-  return VALID_CHARS.includes(resolved) ? resolved : 'bytesurvivor';
+  return VALID_CHARS.includes(id) ? id : 'bytesurvivor';
 }
 
 const app = express();

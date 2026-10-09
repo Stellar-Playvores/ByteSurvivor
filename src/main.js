@@ -358,7 +358,7 @@ window.BYTE_SURVIVOR_SETTINGS = {
   language: 'en',        // 'en' | 'es' - UI language
 
   load() {
-    const saved = localStorage.getItem('byteSurvivorSettings') ?? localStorage.getItem('vibeCoderSettings');
+    const saved = localStorage.getItem('byteSurvivorSettings');
     // Sin datos guardados: idioma por defecto inglés (first open = English)
     if (saved) {
       const data = JSON.parse(saved);

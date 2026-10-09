@@ -4,7 +4,6 @@
  */
 export default class RebirthManager {
   static STORAGE_KEY = 'byteSurvivorRebirth';
-  static LEGACY_STORAGE_KEY = 'vibeCoderRebirth';
 
   // Rebirth milestones
   static MILESTONES = [
@@ -28,7 +27,7 @@ export default class RebirthManager {
    */
   static load() {
     try {
-      const saved = localStorage.getItem(this.STORAGE_KEY) ?? localStorage.getItem(this.LEGACY_STORAGE_KEY);
+      const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved) {
         return JSON.parse(saved);
       }

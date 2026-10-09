@@ -94,7 +94,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('bg-asteroid-1', `${bgBase}/asteroid-1.png`);
     this.load.image('bg-asteroid-2', `${bgBase}/asteroid-2.png`);
 
-    // Arena (gameplay) space backgrounds — one per stage (0–5), seamless cosmic/cyber style
+    // Arena (gameplay) space backgrounds — one per stage (0–5), seamless deep-space style
     const arenaBgBase = getArenaBackgroundBase();
     for (let i = 0; i < 6; i++) {
       this.load.image(`arena-bg-${i}`, `${arenaBgBase}/arena-bg-${i}.png`);

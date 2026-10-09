@@ -13,10 +13,8 @@ marked.setOptions({
 const docImports = import.meta.glob('../**/*.md', { query: '?raw', import: 'default' });
 
 const DOCS_LANG_KEY = 'byteSurvivorDocsLang'; // 'en' | 'es'
-const LEGACY_DOCS_LANG_KEY = 'cosmicCoderDocsLang';
 const DEFAULT_LANG = 'en';
 const DOCS_FONT_SCALE_KEY = 'byteSurvivorDocsFontScale';
-const LEGACY_DOCS_FONT_SCALE_KEY = 'cosmicCoderDocsFontScale';
 const FONT_SCALE_MIN = 0.85;
 const FONT_SCALE_MAX = 1.5;
 const FONT_SCALE_STEP = 0.1;
@@ -60,7 +58,7 @@ const DESCS = {
 
 function getPreferredLang() {
   try {
-    const v = localStorage.getItem(DOCS_LANG_KEY) ?? localStorage.getItem(LEGACY_DOCS_LANG_KEY);
+    const v = localStorage.getItem(DOCS_LANG_KEY);
     if (v === 'es' || v === 'en') return v;
   } catch (_) {}
   return DEFAULT_LANG;
@@ -74,7 +72,7 @@ function setPreferredLang(lang) {
 
 function getDocsFontScale() {
   try {
-    const v = parseFloat(localStorage.getItem(DOCS_FONT_SCALE_KEY) ?? localStorage.getItem(LEGACY_DOCS_FONT_SCALE_KEY));
+    const v = parseFloat(localStorage.getItem(DOCS_FONT_SCALE_KEY));
     if (Number.isFinite(v) && v >= FONT_SCALE_MIN && v <= FONT_SCALE_MAX) return v;
   } catch (_) {}
   return 1;

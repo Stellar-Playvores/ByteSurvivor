@@ -19,7 +19,6 @@
 // ---------------------------------------------------------------------------
 const API_BASE = 'https://bytesurvivor.onrender.com';
 const STORAGE_KEY = 'byteSurvivorJwt';
-const LEGACY_STORAGE_KEY = 'cosmicCoderJwt';
 
 /** Red por defecto para firmar el challenge (Testnet). */
 const DEFAULT_NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
@@ -176,7 +175,7 @@ export async function sep10Login() {
  */
 export function getJWT() {
   try {
-    return localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+    return localStorage.getItem(STORAGE_KEY);
   } catch (_) {
     return null;
   }
@@ -188,7 +187,6 @@ export function getJWT() {
 export function clearJWT() {
   try {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch (_) {}
 }
 

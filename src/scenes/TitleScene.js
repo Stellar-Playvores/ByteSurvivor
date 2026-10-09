@@ -1512,7 +1512,7 @@ export default class TitleScene extends Phaser.Scene {
     ];
 
     this.geminiQuotes = [
-      "Gemini vibes!",
+      "Gemini energy!",
       "Google AI\non the scene"
     ];
 
